@@ -5,6 +5,7 @@
 ### 🐞 Fixes
 
 - `--body-file -` and `--replace-body-file -` now read stdin like the inline `--body -` flags do; previously `resolveContent` treated `-` as a literal filename and failed with `reading file: open -: no such file or directory`, which repeatedly tripped up agents piping issue bodies in ([#123](https://github.com/toba/jig/issues/123))
+- `jig cite review` is now read-only and repeatable instead of advancing `last_checked_sha`/`last_checked_date` as a side effect; a new `jig cite mark [source]` command records sources as reviewed, so agents can re-run review (or recover from output lost to a pipe) without silently skipping the upstream changes ([#124](https://github.com/toba/jig/issues/124))
 
 ## Week of Jun 21 – Jun 27, 2026
 

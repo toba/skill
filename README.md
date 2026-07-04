@@ -35,7 +35,8 @@ Jig is a multi-tool CLI that bundles repo monitoring, a file-based issue tracker
    - **[`cite`](#cite)**: monitor cited repositories for changes
       - **`init`**: add starter citations section to `.jig.yaml`
       - **`add`**: add the given URL to citations
-      - **`review`**: fetch and display changes, update `last_checked_sha`
+      - **`review`**: fetch and display changes (read-only; repeatable)
+      - **`mark`**: record sources as reviewed by advancing `last_checked_sha`
    - **[`nope`](#nope)**: Claude Code `PreToolUse` guard (reads JSON from stdin, exits 0 or 2)
       - **`init`**: scaffold nope rules in `.jig.yaml` and hook in `.claude/settings.json`
       - **`doctor`**: validate nope configuration
@@ -223,7 +224,8 @@ The `cite` subcommand addresses a couple things. It will help check your license
 ```bash
 jig cite init
 jig cite add
-jig cite review
+jig cite review   # read-only: shows changes, repeatable
+jig cite mark     # record as reviewed (advances last_checked_sha)
 jig cite doctor
 ```
 

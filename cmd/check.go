@@ -66,9 +66,7 @@ func capDiff(patch string) (out string, truncated, skipped bool) {
 }
 
 type checkResult struct {
-	display    display.SourceResult
-	headSHA    string // latest commit SHA from fetched data
-	releaseTag string // non-empty when a release was checked
+	display display.SourceResult
 }
 
 func runCheck(cmd *cobra.Command, args []string) error {
@@ -89,7 +87,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 	for i, src := range sources {
 		wg.Go(func() {
 			if src.TracksReleases() {
-				result, headSHA, tag, err := checkSourceReleases(client, src)
+				result, _, _, err := checkSourceReleases(client, src)
 				if err != nil {
 					mu.Lock()
 					fmt.Fprintf(os.Stderr, "warning: %s: %v\n", src.Repo, err)
@@ -97,9 +95,9 @@ func runCheck(cmd *cobra.Command, args []string) error {
 					results[i] = checkResult{display: display.SourceResult{Source: src}}
 					return
 				}
-				results[i] = checkResult{display: *result, headSHA: headSHA, releaseTag: tag}
+				results[i] = checkResult{display: *result}
 			} else {
-				result, headSHA, err := checkSource(client, src)
+				result, _, err := checkSource(client, src)
 				if err != nil {
 					mu.Lock()
 					fmt.Fprintf(os.Stderr, "warning: %s: %v\n", src.Repo, err)
@@ -107,34 +105,15 @@ func runCheck(cmd *cobra.Command, args []string) error {
 					results[i] = checkResult{display: display.SourceResult{Source: src}}
 					return
 				}
-				results[i] = checkResult{display: *result, headSHA: headSHA}
+				results[i] = checkResult{display: *result}
 			}
 		})
 	}
 	wg.Wait()
 
-	// Update last_checked for every source that was successfully checked.
-	dirty := false
-	for _, r := range results {
-		if r.headSHA == "" {
-			continue // error path — checkSource failed
-		}
-		origSrc := config.FindSource(cfg, r.display.Source.Repo)
-		if origSrc == nil {
-			continue
-		}
-		if r.releaseTag != "" {
-			config.MarkSourceRelease(origSrc, r.releaseTag, r.headSHA)
-		} else {
-			config.MarkSource(origSrc, r.headSHA)
-		}
-		dirty = true
-	}
-	if dirty {
-		if err := config.Save(cfgDoc, cfg); err != nil {
-			fmt.Fprintf(os.Stderr, "warning: saving last_checked: %v\n", err)
-		}
-	}
+	// review is read-only: it never advances last_checked. Use `jig cite mark`
+	// to record what you've reviewed. This keeps review idempotent so an agent
+	// can re-run it (or recover from lost output) without losing the changes.
 
 	displayResults := make([]display.SourceResult, len(results))
 	for i, r := range results {

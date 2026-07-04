@@ -22,7 +22,7 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
 - `cmd/` — Cobra commands
   - `todo` parent with `init`, `create`, `list`, `show`, `update`, `comment`, `delete`, `archive`, `roadmap`, `graphql` (alias `query`), `doctor`, `sync` (with `check`, `link`, `unlink` subcommands), `milestone` (alias `ms`; with `create`, `list`, `show`, `update`, `delete`, `migrate` subcommands), `refry`, `tui` subcommands — issue tracking
   - `commit` parent with `gather`, `apply` subcommands — two-phase commit workflow
-  - `cite` parent with `init`, `review` (alias `check`), `add`, `update` subcommands — citation monitoring
+  - `cite` parent with `init`, `review` (alias `check`), `mark`, `add`, `update` subcommands — citation monitoring
   - `nope` parent with `init`, `doctor`, `help` subcommands — security guard
   - `brew` parent with `init`, `doctor` subcommands — Homebrew tap management
   - `scoop` parent with `init`, `doctor` subcommands — Scoop bucket management
@@ -61,7 +61,7 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
 
 - Config uses yaml.v3 Node API for partial read/write to avoid clobbering other sections in `.jig.yaml`
 - GitHub calls shell out to `gh` CLI (no API token management needed)
-- `cite review` (alias `check`) always updates `last_checked_sha`/`last_checked_date`, even when there are no new commits
+- `cite review` (alias `check`) is read-only and repeatable — it never advances `last_checked_sha`/`last_checked_date`, so an agent can re-run it (or recover from lost output) without losing changes. `cite mark` advances the marker (and `last_checked_tag` for release-tracked sources) to current HEAD as a separate explicit step
 - `cite add` inspects a repo via GitHub API or git clone and suggests path classification globs
 - `commit` uses a two-phase gather/apply workflow so the agent can review before committing
 - `brew init` and `scoop init` push to existing shared repos (`owner/homebrew-tap`, `owner/scoop-bucket`); `zed init` uses `internal/companion/` for repo creation
