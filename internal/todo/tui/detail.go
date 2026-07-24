@@ -481,8 +481,11 @@ func (m detailModel) View() string {
 }
 
 func (m detailModel) calculateHeaderHeight() int {
-	// Base: title line + ID/status line + borders/padding = ~6
+	// Base: title line + ID/status line + dates line + borders/padding = ~7
 	baseHeight := 6
+	if m.issue.CreatedAt != nil || m.issue.UpdatedAt != nil {
+		baseHeight++
+	}
 
 	// Add height for links section (separate bordered box)
 	if len(m.links) > 0 {
@@ -532,6 +535,12 @@ func (m detailModel) renderHeader() string {
 		headerContent.WriteString(ui.RenderTags(m.issue.Tags))
 	}
 
+	// Add created/updated dates line if available
+	if dates := m.renderDates(); dates != "" {
+		headerContent.WriteString("\n")
+		headerContent.WriteString(dates)
+	}
+
 	// Header box style - always muted border (not focused, links section is separate)
 	headerBox := lipgloss.NewStyle().
 		Border(lipgloss.RoundedBorder()).
@@ -540,6 +549,22 @@ func (m detailModel) renderHeader() string {
 		Width(m.width - 4)
 
 	return headerBox.Render(headerContent.String())
+}
+
+// renderDates returns a muted "created … · updated …" line, or "" if no dates
+// are set. Dates are formatted as YYYY-MM-DD, matching the rest of the CLI.
+func (m detailModel) renderDates() string {
+	var parts []string
+	if m.issue.CreatedAt != nil {
+		parts = append(parts, "created "+m.issue.CreatedAt.Format(issue.DueDateFormat))
+	}
+	if m.issue.UpdatedAt != nil {
+		parts = append(parts, "updated "+m.issue.UpdatedAt.Format(issue.DueDateFormat))
+	}
+	if len(parts) == 0 {
+		return ""
+	}
+	return ui.Muted.Render(strings.Join(parts, " · "))
 }
 
 // formatLinkLabel returns a human-readable label for the link type

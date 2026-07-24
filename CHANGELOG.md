@@ -2,6 +2,10 @@
 
 ## Week of Jul 19 – Jul 25, 2026
 
+### ✨ Features
+
+- The TUI issue detail header now shows the created and updated dates as a muted line beneath the ID/status row ([#126](https://github.com/toba/jig/issues/126))
+
 ### 🗜️ Tweaks
 
 - Update all Go dependencies to latest; pin the `bleve` stack to the versions `bleve/v2 v2.6.0` declares (a blanket upgrade broke compilation via a `roaring` `.Value` arity change) and regenerate the `gqlgen` output for v0.17.94 ([#125](https://github.com/toba/jig/issues/125))
