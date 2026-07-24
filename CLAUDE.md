@@ -30,7 +30,7 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
   - `prime` — output instructions for AI coding agents
   - `doctor` — run all doctor checks (nope, brew, scoop, zed)
   - `help-all` — show all commands and flags in agent-friendly format
-  - `tui` — top-level alias for `todo tui`
+  - `tui` — top-level alias for `todo tui`; bare `jig` (no subcommand) also opens the TUI
   - `sync` — top-level alias for `todo sync` (with `check`, `link`, `unlink` subcommands)
   - `update`, `version` — top-level utilities
 - `internal/config/` — `.jig.yaml` partial read/write via yaml.v3 Node API (citations section)
@@ -78,4 +78,4 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
 - `todo` stores issues as markdown files with YAML frontmatter in `.issues/`
 - `todo` milestones are first-class entities (NOT an issue type), stored as files in `.issues/milestones/` (skipped by the issue loader); an issue references one via its `milestone:` frontmatter field (a milestone ID). The TUI shows the milestone short name as a badge, `m` reassigns, `g m` filters. GitHub sync maps milestone entities ↔ GitHub milestones (number stored on the milestone file's `sync.github`). The legacy `milestone` issue *type* is retired; `jig todo milestone migrate` converts old `type: milestone` issues into entities
 - `todo` supports GraphQL queries/mutations via embedded gqlgen schema
-- `tui` and `sync` have top-level aliases that call `initTodoCore()` in their own PreRunE
+- `tui` and `sync` have top-level aliases that call `initTodoCore()` in their own PreRunE; the root command's `RunE` opens the TUI for bare `jig` (guarded by `cobra.NoArgs` so unknown subcommands still error)

@@ -9,6 +9,7 @@ import (
 	"github.com/toba/jig/internal/config"
 	"github.com/toba/jig/internal/constants"
 	"github.com/toba/jig/internal/nope"
+	"github.com/toba/jig/internal/todo/tui"
 )
 
 var (
@@ -24,6 +25,16 @@ var rootCmd = &cobra.Command{
 	Long:  "Multi-tool CLI combining citation monitoring, companion management, and Claude Code security guard.",
 	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 		return nil
+	},
+	// Bare `jig` (no subcommand) opens the interactive TUI, same as `jig todo tui`.
+	// Args are constrained to none so unknown subcommands still error instead of
+	// silently falling through to the TUI.
+	Args: cobra.NoArgs,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := initTodoCore(cmd); err != nil {
+			return err
+		}
+		return tui.Run(todoStore, todoCfg)
 	},
 }
 

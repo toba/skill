@@ -1,5 +1,11 @@
 # Changelog
 
+## Week of Jul 19 – Jul 25, 2026
+
+### 🗜️ Tweaks
+
+- Update all Go dependencies to latest; pin the `bleve` stack to the versions `bleve/v2 v2.6.0` declares (a blanket upgrade broke compilation via a `roaring` `.Value` arity change) and regenerate the `gqlgen` output for v0.17.94 ([#125](https://github.com/toba/jig/issues/125))
+
 ## Week of Jun 28 – Jul 4, 2026
 
 ### 🐞 Fixes
