@@ -807,6 +807,44 @@ func TestMutationCreateIssue(t *testing.T) {
 	})
 }
 
+func TestMutationIssueExternalID(t *testing.T) {
+	resolver, _ := setupTestResolver(t)
+	ctx := context.Background()
+	mr := resolver.Mutation()
+
+	extID := "JIRA-42"
+	created, err := mr.CreateIssue(ctx, model.CreateIssueInput{
+		Title:      "External issue",
+		ExternalID: &extID,
+	})
+	if err != nil {
+		t.Fatalf("CreateIssue() error = %v", err)
+	}
+	if created.ExternalID != "JIRA-42" {
+		t.Errorf("CreateIssue().ExternalID = %q, want %q", created.ExternalID, "JIRA-42")
+	}
+
+	// Update to a new value.
+	newID := "JIRA-99"
+	updated, err := mr.UpdateIssue(ctx, created.ID, model.UpdateIssueInput{ExternalID: &newID})
+	if err != nil {
+		t.Fatalf("UpdateIssue() error = %v", err)
+	}
+	if updated.ExternalID != "JIRA-99" {
+		t.Errorf("UpdateIssue().ExternalID = %q, want %q", updated.ExternalID, "JIRA-99")
+	}
+
+	// Empty string clears it.
+	empty := ""
+	cleared, err := mr.UpdateIssue(ctx, created.ID, model.UpdateIssueInput{ExternalID: &empty})
+	if err != nil {
+		t.Fatalf("UpdateIssue() error = %v", err)
+	}
+	if cleared.ExternalID != "" {
+		t.Errorf("UpdateIssue().ExternalID = %q, want empty", cleared.ExternalID)
+	}
+}
+
 func TestMutationCreateIssueGeneratesID(t *testing.T) {
 	resolver, _ := setupTestResolver(t)
 	ctx := context.Background()

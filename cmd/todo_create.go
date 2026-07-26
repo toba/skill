@@ -14,18 +14,19 @@ import (
 )
 
 var (
-	createStatus    string
-	createType      string
-	createPriority  string
-	createMilestone string
-	createBody      string
-	createBodyFile  string
-	createTag       []string
-	createDue       string
-	createParent    string
-	createBlocking  []string
-	createBlockedBy []string
-	createJSON      bool
+	createStatus     string
+	createType       string
+	createPriority   string
+	createMilestone  string
+	createExternalID string
+	createBody       string
+	createBodyFile   string
+	createTag        []string
+	createDue        string
+	createParent     string
+	createBlocking   []string
+	createBlockedBy  []string
+	createJSON       bool
 )
 
 var createCmd = &cobra.Command{
@@ -80,6 +81,9 @@ var createCmd = &cobra.Command{
 		if createMilestone != "" {
 			input.Milestone = &createMilestone
 		}
+		if createExternalID != "" {
+			input.ExternalID = &createExternalID
+		}
 		if body != "" {
 			input.Body = &body
 		}
@@ -124,6 +128,7 @@ func init() {
 	createCmd.Flags().StringVarP(&createType, "type", "t", "", "issue type ("+strings.Join(typeNames, ", ")+")")
 	createCmd.Flags().StringVarP(&createPriority, "priority", "p", "", "Priority level ("+strings.Join(priorityNames, ", ")+")")
 	createCmd.Flags().StringVar(&createMilestone, "milestone", "", "Milestone ID to assign this issue to")
+	createCmd.Flags().StringVar(&createExternalID, "external-id", "", "External identifier referencing this issue in another system")
 	createCmd.Flags().StringVarP(&createBody, "body", "d", "", "Body content (use '-' to read from stdin)")
 	createCmd.Flags().StringVar(&createBodyFile, "body-file", "", "Read body from file (use '-' to read from stdin)")
 	createCmd.Flags().StringArrayVar(&createTag, "tag", nil, "Add tag (can be repeated)")

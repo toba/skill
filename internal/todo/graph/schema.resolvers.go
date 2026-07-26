@@ -166,6 +166,9 @@ func (r *mutationResolver) CreateIssue(ctx context.Context, input model.CreateIs
 		}
 		b.Milestone = *input.Milestone
 	}
+	if input.ExternalID != nil {
+		b.ExternalID = *input.ExternalID
+	}
 	if input.Body != nil {
 		b.Body = *input.Body
 	}
@@ -282,6 +285,9 @@ func (r *mutationResolver) UpdateIssue(ctx context.Context, id string, input mod
 			}
 			b.Milestone = *input.Milestone
 		}
+	}
+	if input.ExternalID != nil {
+		b.ExternalID = *input.ExternalID
 	}
 	if input.Due != nil {
 		if *input.Due == "" {

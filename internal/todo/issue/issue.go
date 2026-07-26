@@ -199,15 +199,18 @@ type Issue struct {
 	Path string `yaml:"-" json:"path"`
 
 	// Front matter fields
-	Title     string     `yaml:"title" json:"title"`
-	Status    string     `yaml:"status" json:"status"`
-	Type      string     `yaml:"type,omitempty" json:"type,omitempty"`
-	Priority  string     `yaml:"priority,omitempty" json:"priority,omitempty"`
-	Milestone string     `yaml:"milestone,omitempty" json:"milestone,omitempty"` // milestone id
-	Tags      []string   `yaml:"tags,omitempty" json:"tags,omitempty"`
-	CreatedAt *time.Time `yaml:"created_at,omitempty" json:"created_at,omitempty"`
-	UpdatedAt *time.Time `yaml:"updated_at,omitempty" json:"updated_at,omitempty"`
-	Due       *DueDate   `yaml:"due,omitempty" json:"due,omitempty"`
+	Title     string `yaml:"title" json:"title"`
+	Status    string `yaml:"status" json:"status"`
+	Type      string `yaml:"type,omitempty" json:"type,omitempty"`
+	Priority  string `yaml:"priority,omitempty" json:"priority,omitempty"`
+	Milestone string `yaml:"milestone,omitempty" json:"milestone,omitempty"` // milestone id
+	// ExternalID is an optional free-form identifier referencing this issue in
+	// another system (e.g. a Jira key or a ticket number in a legacy tracker).
+	ExternalID string     `yaml:"external_id,omitempty" json:"external_id,omitempty"`
+	Tags       []string   `yaml:"tags,omitempty" json:"tags,omitempty"`
+	CreatedAt  *time.Time `yaml:"created_at,omitempty" json:"created_at,omitempty"`
+	UpdatedAt  *time.Time `yaml:"updated_at,omitempty" json:"updated_at,omitempty"`
+	Due        *DueDate   `yaml:"due,omitempty" json:"due,omitempty"`
 
 	// Body is the markdown content after the front matter.
 	Body string `yaml:"-" json:"body,omitempty"`
@@ -227,19 +230,20 @@ type Issue struct {
 
 // frontMatter is the subset of Issue that gets serialized to YAML front matter.
 type frontMatter struct {
-	Title     string                    `yaml:"title"`
-	Status    string                    `yaml:"status"`
-	Type      string                    `yaml:"type,omitempty"`
-	Priority  string                    `yaml:"priority,omitempty"`
-	Milestone string                    `yaml:"milestone,omitempty"`
-	Tags      []string                  `yaml:"tags,omitempty"`
-	CreatedAt *time.Time                `yaml:"created_at,omitempty"`
-	UpdatedAt *time.Time                `yaml:"updated_at,omitempty"`
-	Due       *DueDate                  `yaml:"due,omitempty"`
-	Parent    string                    `yaml:"parent,omitempty"`
-	Blocking  []string                  `yaml:"blocking,omitempty"`
-	BlockedBy []string                  `yaml:"blocked_by,omitempty"`
-	Sync      map[string]map[string]any `yaml:"sync,omitempty"`
+	Title      string                    `yaml:"title"`
+	Status     string                    `yaml:"status"`
+	Type       string                    `yaml:"type,omitempty"`
+	Priority   string                    `yaml:"priority,omitempty"`
+	Milestone  string                    `yaml:"milestone,omitempty"`
+	ExternalID string                    `yaml:"external_id,omitempty"`
+	Tags       []string                  `yaml:"tags,omitempty"`
+	CreatedAt  *time.Time                `yaml:"created_at,omitempty"`
+	UpdatedAt  *time.Time                `yaml:"updated_at,omitempty"`
+	Due        *DueDate                  `yaml:"due,omitempty"`
+	Parent     string                    `yaml:"parent,omitempty"`
+	Blocking   []string                  `yaml:"blocking,omitempty"`
+	BlockedBy  []string                  `yaml:"blocked_by,omitempty"`
+	Sync       map[string]map[string]any `yaml:"sync,omitempty"`
 }
 
 // Parse reads an issue from a reader (markdown with YAML front matter).
@@ -254,56 +258,59 @@ func Parse(r io.Reader) (*Issue, error) {
 	bodyStr := strings.TrimSuffix(string(body), "\n")
 
 	return &Issue{
-		Title:     fm.Title,
-		Status:    fm.Status,
-		Type:      fm.Type,
-		Priority:  fm.Priority,
-		Milestone: fm.Milestone,
-		Tags:      fm.Tags,
-		CreatedAt: fm.CreatedAt,
-		UpdatedAt: fm.UpdatedAt,
-		Due:       fm.Due,
-		Body:      bodyStr,
-		Parent:    fm.Parent,
-		Blocking:  fm.Blocking,
-		BlockedBy: fm.BlockedBy,
-		Sync:      fm.Sync,
+		Title:      fm.Title,
+		Status:     fm.Status,
+		Type:       fm.Type,
+		Priority:   fm.Priority,
+		Milestone:  fm.Milestone,
+		ExternalID: fm.ExternalID,
+		Tags:       fm.Tags,
+		CreatedAt:  fm.CreatedAt,
+		UpdatedAt:  fm.UpdatedAt,
+		Due:        fm.Due,
+		Body:       bodyStr,
+		Parent:     fm.Parent,
+		Blocking:   fm.Blocking,
+		BlockedBy:  fm.BlockedBy,
+		Sync:       fm.Sync,
 	}, nil
 }
 
 // renderFrontMatter is used for YAML output with yaml.v3 (supports custom marshalers).
 type renderFrontMatter struct {
-	Title     string                    `yaml:"title"`
-	Status    string                    `yaml:"status"`
-	Type      string                    `yaml:"type,omitempty"`
-	Priority  string                    `yaml:"priority,omitempty"`
-	Milestone string                    `yaml:"milestone,omitempty"`
-	Tags      []string                  `yaml:"tags,omitempty"`
-	CreatedAt *time.Time                `yaml:"created_at,omitempty"`
-	UpdatedAt *time.Time                `yaml:"updated_at,omitempty"`
-	Due       *DueDate                  `yaml:"due,omitempty"`
-	Parent    string                    `yaml:"parent,omitempty"`
-	Blocking  []string                  `yaml:"blocking,omitempty"`
-	BlockedBy []string                  `yaml:"blocked_by,omitempty"`
-	Sync      map[string]map[string]any `yaml:"sync,omitempty"`
+	Title      string                    `yaml:"title"`
+	Status     string                    `yaml:"status"`
+	Type       string                    `yaml:"type,omitempty"`
+	Priority   string                    `yaml:"priority,omitempty"`
+	Milestone  string                    `yaml:"milestone,omitempty"`
+	ExternalID string                    `yaml:"external_id,omitempty"`
+	Tags       []string                  `yaml:"tags,omitempty"`
+	CreatedAt  *time.Time                `yaml:"created_at,omitempty"`
+	UpdatedAt  *time.Time                `yaml:"updated_at,omitempty"`
+	Due        *DueDate                  `yaml:"due,omitempty"`
+	Parent     string                    `yaml:"parent,omitempty"`
+	Blocking   []string                  `yaml:"blocking,omitempty"`
+	BlockedBy  []string                  `yaml:"blocked_by,omitempty"`
+	Sync       map[string]map[string]any `yaml:"sync,omitempty"`
 }
 
 // Render serializes the issue back to markdown with YAML front matter.
 func (b *Issue) Render() ([]byte, error) {
 	fm := renderFrontMatter{
-		Title:     b.Title,
-		Status:    b.Status,
-		Type:      b.Type,
-		Priority:  b.Priority,
-		Milestone: b.Milestone,
-		Tags:      b.Tags,
-		CreatedAt: b.CreatedAt,
-		UpdatedAt: b.UpdatedAt,
-		Due:       b.Due,
-		Parent:    b.Parent,
-		Blocking:  b.Blocking,
-		BlockedBy: b.BlockedBy,
-		Sync:      b.Sync,
+		Title:      b.Title,
+		Status:     b.Status,
+		Type:       b.Type,
+		Priority:   b.Priority,
+		Milestone:  b.Milestone,
+		ExternalID: b.ExternalID,
+		Tags:       b.Tags,
+		CreatedAt:  b.CreatedAt,
+		UpdatedAt:  b.UpdatedAt,
+		Due:        b.Due,
+		Parent:     b.Parent,
+		Blocking:   b.Blocking,
+		BlockedBy:  b.BlockedBy,
+		Sync:       b.Sync,
 	}
 
 	fmBytes, err := yaml.Marshal(&fm)

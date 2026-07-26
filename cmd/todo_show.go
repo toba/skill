@@ -151,6 +151,10 @@ func writeStyledIssue(w io.Writer, b *issue.Issue, color bool) {
 		header.WriteString(" ")
 		header.WriteString(ui.Muted.Render("due:" + b.Due.String()))
 	}
+	if b.ExternalID != "" {
+		header.WriteString(" ")
+		header.WriteString(ui.Muted.Render("ext:" + b.ExternalID))
+	}
 	if len(b.Tags) > 0 {
 		header.WriteString("  ")
 		header.WriteString(ui.Muted.Render(strings.Join(b.Tags, ", ")))

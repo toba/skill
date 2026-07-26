@@ -69,11 +69,11 @@ Run `jig todo <command> --help` for full options.
 
 ## create flags
 
-`-t/--type` (required), `-s/--status` (default: ready), `-p/--priority`, `-d/--body` (`-` for stdin), `--body-file <path>` (`-` for stdin), `--tag` (repeatable), `--due YYYY-MM-DD`, `--parent <id>`, `--blocking <id>` (repeatable), `--blocked-by <id>` (repeatable)
+`-t/--type` (required), `-s/--status` (default: ready), `-p/--priority`, `-d/--body` (`-` for stdin), `--body-file <path>` (`-` for stdin), `--tag` (repeatable), `--due YYYY-MM-DD`, `--parent <id>`, `--blocking <id>` (repeatable), `--blocked-by <id>` (repeatable), `--external-id <id>` (reference in another system)
 
 ## update flags
 
-`-s/--status`, `-t/--type`, `-p/--priority` (empty to clear), `--title`, `--due` (empty to clear), `--append-body "content"` (`-` for stdin), `--body-replace-old`/`--body-replace-new` (substring edit), `--replace-body`/`--replace-body-file` (destructive: overwrites the entire body; both take `-` for stdin), `--parent`/`--remove-parent`, `--blocking`/`--remove-blocking`, `--blocked-by`/`--remove-blocked-by`, `--tag`/`--remove-tag`, `--if-match <etag>`
+`-s/--status`, `-t/--type`, `-p/--priority` (empty to clear), `--title`, `--due` (empty to clear), `--append-body "content"` (`-` for stdin), `--body-replace-old`/`--body-replace-new` (substring edit), `--replace-body`/`--replace-body-file` (destructive: overwrites the entire body; both take `-` for stdin), `--parent`/`--remove-parent`, `--blocking`/`--remove-blocking`, `--blocked-by`/`--remove-blocked-by`, `--tag`/`--remove-tag`, `--external-id` (empty to clear), `--if-match <etag>`
 
 There is no `--body` on `update` (it silently replaced everything). Default to `--append-body` or `--body-replace-old/new`; only use `--replace-body` when you deliberately want to discard the existing body.
 

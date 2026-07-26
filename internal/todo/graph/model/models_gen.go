@@ -38,6 +38,8 @@ type CreateIssueInput struct {
 	Priority *string `json:"priority,omitempty"`
 	// Milestone ID this issue is assigned to
 	Milestone *string `json:"milestone,omitempty"`
+	// External identifier referencing this issue in another system
+	ExternalID *string `json:"externalId,omitempty"`
 	// Tags for categorization
 	Tags []string `json:"tags,omitempty"`
 	// Markdown body content
@@ -164,6 +166,8 @@ type UpdateIssueInput struct {
 	Priority *string `json:"priority,omitempty"`
 	// Milestone ID (empty string to clear)
 	Milestone *string `json:"milestone,omitempty"`
+	// External identifier (empty string to clear)
+	ExternalID *string `json:"externalId,omitempty"`
 	// Replace all tags (nil preserves existing, mutually exclusive with addTags/removeTags)
 	Tags []string `json:"tags,omitempty"`
 	// Add tags to existing list

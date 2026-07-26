@@ -4,6 +4,7 @@
 
 ### ✨ Features
 
+- Issues can now store an optional `external_id` in frontmatter referencing another system (e.g. a Jira key); wired through the model, GraphQL schema/resolvers, the `--external-id` flag on `create`/`update`, and the `show`/TUI headers ([#127](https://github.com/toba/jig/issues/127))
 - The TUI issue detail header now shows the created and updated dates as a muted line beneath the ID/status row ([#126](https://github.com/toba/jig/issues/126))
 
 ### 🗜️ Tweaks

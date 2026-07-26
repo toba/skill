@@ -20,6 +20,7 @@ var (
 	updateType            string
 	updatePriority        string
 	updateMilestone       string
+	updateExternalID      string
 	updateTitle           string
 	updateBody            string
 	updateBodyFile        string
@@ -98,7 +99,7 @@ var todoUpdateCmd = &cobra.Command{
 
 		if len(changes) == 0 {
 			return cmdError(todoUpdateJSON, output.ErrValidation,
-				"no changes specified (use --status, --type, --priority, --title, --due, --append-body, --body-replace-old/--body-replace-new, --replace-body, --parent, --blocking, --blocked-by, --tag, or their --remove-* variants)")
+				"no changes specified (use --status, --type, --priority, --title, --due, --milestone, --external-id, --append-body, --body-replace-old/--body-replace-new, --replace-body, --parent, --blocking, --blocked-by, --tag, or their --remove-* variants)")
 		}
 
 		if todoUpdateJSON {
@@ -152,6 +153,11 @@ func buildUpdateInput(cmd *cobra.Command, _ []string, _ string) (model.UpdateIss
 	if cmd.Flags().Changed("milestone") {
 		input.Milestone = &updateMilestone
 		changes = append(changes, "milestone")
+	}
+
+	if cmd.Flags().Changed("external-id") {
+		input.ExternalID = &updateExternalID
+		changes = append(changes, "external-id")
 	}
 
 	if cmd.Flags().Changed("title") {
@@ -259,6 +265,7 @@ func buildUpdateInput(cmd *cobra.Command, _ []string, _ string) (model.UpdateIss
 
 func hasFieldUpdates(input model.UpdateIssueInput) bool {
 	return input.Status != nil || input.Type != nil || input.Priority != nil || input.Milestone != nil ||
+		input.ExternalID != nil ||
 		input.Title != nil || input.Due != nil || input.Body != nil || input.BodyMod != nil || input.Tags != nil ||
 		input.AddTags != nil || input.RemoveTags != nil ||
 		input.Parent != nil || input.AddBlocking != nil || input.RemoveBlocking != nil ||
@@ -291,6 +298,7 @@ func registerUpdateFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&updatePriority, "priority", "p", "", "New priority ("+strings.Join(priorityNames, ", ")+", or empty to clear)")
 	cmd.Flags().StringVar(&updateTitle, "title", "", "New title")
 	cmd.Flags().StringVar(&updateMilestone, "milestone", "", "Milestone ID to assign (empty to clear)")
+	cmd.Flags().StringVar(&updateExternalID, "external-id", "", "External identifier referencing this issue in another system (empty to clear)")
 	cmd.Flags().StringVar(&updateDue, "due", "", "Due date (YYYY-MM-DD, empty to clear)")
 
 	// Whole-body writes. --replace-body is destructive (overwrites everything);

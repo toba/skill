@@ -2180,6 +2180,113 @@ func TestDueDateJSON(t *testing.T) {
 	}
 }
 
+func TestParseWithExternalID(t *testing.T) {
+	tests := []struct {
+		name       string
+		input      string
+		expectedID string
+	}{
+		{
+			name: "with external id",
+			input: `---
+title: Test
+status: todo
+external_id: JIRA-1234
+---`,
+			expectedID: "JIRA-1234",
+		},
+		{
+			name: "without external id",
+			input: `---
+title: Test
+status: todo
+---`,
+			expectedID: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b, err := Parse(strings.NewReader(tt.input))
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if b.ExternalID != tt.expectedID {
+				t.Errorf("ExternalID = %q, want %q", b.ExternalID, tt.expectedID)
+			}
+		})
+	}
+}
+
+func TestRenderWithExternalID(t *testing.T) {
+	tests := []struct {
+		name        string
+		issue       *Issue
+		contains    []string
+		notContains []string
+	}{
+		{
+			name: "with external id",
+			issue: &Issue{
+				Title:      "Test Issue",
+				Status:     "todo",
+				ExternalID: "JIRA-1234",
+			},
+			contains: []string{"external_id: JIRA-1234"},
+		},
+		{
+			name: "without external id",
+			issue: &Issue{
+				Title:  "Test Issue",
+				Status: "todo",
+			},
+			notContains: []string{"external_id:"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			output, err := tt.issue.Render()
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			result := string(output)
+			for _, want := range tt.contains {
+				if !strings.Contains(result, want) {
+					t.Errorf("output missing %q\ngot:\n%s", want, result)
+				}
+			}
+			for _, notWant := range tt.notContains {
+				if strings.Contains(result, notWant) {
+					t.Errorf("output should not contain %q\ngot:\n%s", notWant, result)
+				}
+			}
+		})
+	}
+}
+
+func TestExternalIDRoundtrip(t *testing.T) {
+	original := &Issue{
+		Title:      "Test",
+		Status:     "todo",
+		ExternalID: "ABC-42",
+	}
+
+	rendered, err := original.Render()
+	if err != nil {
+		t.Fatalf("Render error: %v", err)
+	}
+
+	parsed, err := Parse(strings.NewReader(string(rendered)))
+	if err != nil {
+		t.Fatalf("Parse error: %v", err)
+	}
+
+	if parsed.ExternalID != original.ExternalID {
+		t.Errorf("ExternalID = %q, want %q", parsed.ExternalID, original.ExternalID)
+	}
+}
+
 func TestETagChangesAfterModification(t *testing.T) {
 	// Verify that ETag changes reflect actual content changes
 	// (this is important for optimistic concurrency control)

@@ -132,6 +132,8 @@ input CreateIssueInput {
   priority: String
   "Milestone ID this issue is assigned to"
   milestone: String
+  "External identifier referencing this issue in another system"
+  externalId: String
   "Tags for categorization"
   tags: [String!]
   "Markdown body content"
@@ -160,6 +162,8 @@ input UpdateIssueInput {
   priority: String
   "Milestone ID (empty string to clear)"
   milestone: String
+  "External identifier (empty string to clear)"
+  externalId: String
   "Replace all tags (nil preserves existing, mutually exclusive with addTags/removeTags)"
   tags: [String!]
   "Add tags to existing list"
@@ -256,6 +260,8 @@ type Issue {
   due: String
   "Milestone ID this issue is assigned to (null if not set)"
   milestone: String
+  "External identifier referencing this issue in another system (null if not set)"
+  externalId: String
   "Markdown body content"
   body: String!
   "Content hash for optimistic concurrency control"

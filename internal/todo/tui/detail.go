@@ -483,7 +483,7 @@ func (m detailModel) View() string {
 func (m detailModel) calculateHeaderHeight() int {
 	// Base: title line + ID/status line + dates line + borders/padding = ~7
 	baseHeight := 6
-	if m.issue.CreatedAt != nil || m.issue.UpdatedAt != nil {
+	if m.issue.CreatedAt != nil || m.issue.UpdatedAt != nil || m.issue.ExternalID != "" {
 		baseHeight++
 	}
 
@@ -560,6 +560,9 @@ func (m detailModel) renderDates() string {
 	}
 	if m.issue.UpdatedAt != nil {
 		parts = append(parts, "updated "+m.issue.UpdatedAt.Format(issue.DueDateFormat))
+	}
+	if m.issue.ExternalID != "" {
+		parts = append(parts, "ext "+m.issue.ExternalID)
 	}
 	if len(parts) == 0 {
 		return ""

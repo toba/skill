@@ -51,6 +51,7 @@ type ComplexityRoot struct {
 		CreatedAt    func(childComplexity int) int
 		Due          func(childComplexity int) int
 		ETag         func(childComplexity int) int
+		ExternalID   func(childComplexity int) int
 		ID           func(childComplexity int) int
 		Milestone    func(childComplexity int) int
 		Parent       func(childComplexity int) int
@@ -224,6 +225,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Issue.ETag(childComplexity), true
+	case "Issue.externalId":
+		if e.ComplexityRoot.Issue.ExternalID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Issue.ExternalID(childComplexity), true
 	case "Issue.id":
 		if e.ComplexityRoot.Issue.ID == nil {
 			break
@@ -629,6 +636,8 @@ func (ec *executionContext) childFields_Issue(ctx context.Context, field graphql
 		return ec.fieldContext_Issue_due(ctx, field)
 	case "milestone":
 		return ec.fieldContext_Issue_milestone(ctx, field)
+	case "externalId":
+		return ec.fieldContext_Issue_externalId(ctx, field)
 	case "body":
 		return ec.fieldContext_Issue_body(ctx, field)
 	case "etag":
@@ -1400,6 +1409,29 @@ func (ec *executionContext) _Issue_milestone(ctx context.Context, field graphql.
 	)
 }
 func (ec *executionContext) fieldContext_Issue_milestone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Issue", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Issue_externalId(ctx context.Context, field graphql.CollectedField, obj *issue.Issue) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Issue_externalId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ExternalID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalOString2string(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Issue_externalId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Issue", field, false, false, errors.New("field of type String does not have child fields"))
 }
 
@@ -3657,7 +3689,7 @@ func (ec *executionContext) unmarshalInputCreateIssueInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "type", "status", "priority", "milestone", "tags", "body", "due", "parent", "blocking", "blockedBy"}
+	fieldsInOrder := [...]string{"title", "type", "status", "priority", "milestone", "externalId", "tags", "body", "due", "parent", "blocking", "blockedBy"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -3699,6 +3731,13 @@ func (ec *executionContext) unmarshalInputCreateIssueInput(ctx context.Context, 
 				return it, err
 			}
 			it.Milestone = data
+		case "externalId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalID = data
 		case "tags":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
 			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -4043,7 +4082,7 @@ func (ec *executionContext) unmarshalInputUpdateIssueInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"title", "status", "type", "priority", "milestone", "tags", "addTags", "removeTags", "body", "bodyMod", "due", "parent", "addBlocking", "removeBlocking", "addBlockedBy", "removeBlockedBy", "ifMatch"}
+	fieldsInOrder := [...]string{"title", "status", "type", "priority", "milestone", "externalId", "tags", "addTags", "removeTags", "body", "bodyMod", "due", "parent", "addBlocking", "removeBlocking", "addBlockedBy", "removeBlockedBy", "ifMatch"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -4085,6 +4124,13 @@ func (ec *executionContext) unmarshalInputUpdateIssueInput(ctx context.Context, 
 				return it, err
 			}
 			it.Milestone = data
+		case "externalId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("externalId"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ExternalID = data
 		case "tags":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tags"))
 			data, err := ec.unmarshalOString2ᚕstringᚄ(ctx, v)
@@ -4335,6 +4381,11 @@ func (ec *executionContext) _Issue(ctx context.Context, sel ast.SelectionSet, ob
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "milestone":
 			out.Values[i] = ec._Issue_milestone(ctx, field, obj)
+			if out.Values[i] == graphql.RequiredNull {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "externalId":
+			out.Values[i] = ec._Issue_externalId(ctx, field, obj)
 			if out.Values[i] == graphql.RequiredNull {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
