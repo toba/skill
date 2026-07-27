@@ -43,8 +43,12 @@ Exit codes:
 			return nope.ExitError{Code: 2}
 		}
 
-		// 2. Todo sync (if configured) — before staging so metadata changes are included.
-		syncTodoIfConfigured(cmd)
+		// 2. Todo sync (if configured) — off by default; opt in with --sync.
+		//    The full external sync (e.g. ClickUp) is slow and does not belong on
+		//    the commit hot path; run `jig todo sync` on its own cadence instead.
+		if commitSync {
+			syncTodoIfConfigured(cmd)
+		}
 
 		// 3. Stage all changes.
 		status, err := commitpkg.StageAll()
@@ -98,6 +102,7 @@ var (
 	applyMessage string
 	applyVersion string
 	applyPush    bool
+	commitSync   bool
 )
 
 var applyCmd = &cobra.Command{
@@ -107,8 +112,10 @@ var applyCmd = &cobra.Command{
 and pushes to the remote.`,
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// 1. Sync todo before commit so metadata changes are included.
-		syncTodoIfConfigured(cmd)
+		// 1. Sync todo before commit — off by default; opt in with --sync.
+		if commitSync {
+			syncTodoIfConfigured(cmd)
+		}
 
 		// Re-stage .issues/ in case sync modified files after gather staged them.
 		if err := commitpkg.RestageIssues(); err != nil {
@@ -170,6 +177,11 @@ func init() {
 	_ = applyCmd.MarkFlagRequired("message")
 	applyCmd.Flags().StringVarP(&applyVersion, "version", "v", "", "version tag to create")
 	applyCmd.Flags().BoolVar(&applyPush, "push", false, "push commits and tags after committing")
+
+	// Off by default: the external issue sync (ClickUp/GitHub) is slow and does
+	// not belong on the commit hot path. Opt in per-invocation with --sync.
+	gatherCmd.Flags().BoolVar(&commitSync, "sync", false, "sync issues to external integrations before staging")
+	applyCmd.Flags().BoolVar(&commitSync, "sync", false, "sync issues to external integrations before committing")
 
 	commitCmd.AddCommand(gatherCmd)
 	commitCmd.AddCommand(applyCmd)

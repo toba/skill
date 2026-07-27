@@ -27,8 +27,9 @@ func CompareByCreatedDesc(a, b *Issue) int {
 	return cmp.Compare(a.ID, b.ID)
 }
 
-// CompareByStatusPriorityAndType returns true if a should sort before b,
-// using status order, then priority, then type, then title.
+// CompareByStatusPriorityAndType returns true if a should sort before b, using
+// status order, then activity date (updated_at, falling back to created_at;
+// newest first), then priority, then type, then title.
 // Unrecognized statuses, priorities, and types are sorted last within their category.
 // Issues without priority are treated as "normal" priority for sorting purposes.
 func CompareByStatusPriorityAndType(a, b *Issue, statusNames, priorityNames, typeNames []string) bool {
@@ -82,22 +83,55 @@ func CompareByStatusPriorityAndType(a, b *Issue, statusNames, priorityNames, typ
 	if oi != oj {
 		return oi < oj
 	}
-	// Secondary: priority order
+	// Secondary: activity date (updated_at, falling back to created_at),
+	// newest first; issues without either date sort last.
+	if c := compareActivityDesc(a, b); c != 0 {
+		return c < 0
+	}
+	// Tertiary: priority order
 	pi, pj := getPriorityOrder(a.Priority), getPriorityOrder(b.Priority)
 	if pi != pj {
 		return pi < pj
 	}
-	// Tertiary: type order
+	// Quaternary: type order
 	ti, tj := getTypeOrder(a.Type), getTypeOrder(b.Type)
 	if ti != tj {
 		return ti < tj
 	}
-	// Quaternary: title (case-insensitive) for stable, user-friendly ordering
+	// Final: title (case-insensitive) for stable, user-friendly ordering
 	return strings.ToLower(a.Title) < strings.ToLower(b.Title)
 }
 
-// SortByStatusPriorityAndType sorts issues by status order, then priority, then type, then title.
-// This is the default sorting used by both CLI and TUI.
+// activityDate returns the issue's updated date, falling back to its created
+// date when updated_at is unset. Returns nil when neither is set.
+func activityDate(b *Issue) *time.Time {
+	if b.UpdatedAt != nil {
+		return b.UpdatedAt
+	}
+	return b.CreatedAt
+}
+
+// compareActivityDesc orders two issues by activity date (updated_at, falling
+// back to created_at), newest first. Issues without either date sort last.
+// Returns 0 when the dates are equal (or both missing), leaving the decision to
+// lower-priority sort keys.
+func compareActivityDesc(a, b *Issue) int {
+	da, db := activityDate(a), activityDate(b)
+	if da == nil && db == nil {
+		return 0
+	}
+	if da == nil {
+		return 1
+	}
+	if db == nil {
+		return -1
+	}
+	return db.Compare(*da) // newest first
+}
+
+// SortByStatusPriorityAndType sorts issues by status order, then activity date
+// (updated_at, falling back to created_at; newest first), then priority, then
+// type, then title. This is the default sorting used by both CLI and TUI.
 func SortByStatusPriorityAndType(issues []*Issue, statusNames, priorityNames, typeNames []string) {
 	slices.SortFunc(issues, func(a, b *Issue) int {
 		if CompareByStatusPriorityAndType(a, b, statusNames, priorityNames, typeNames) {

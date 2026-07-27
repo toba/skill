@@ -30,6 +30,72 @@ func TestSortByStatusPriorityAndType(t *testing.T) {
 		}
 	})
 
+	t.Run("sorts by updated date after status, before priority", func(t *testing.T) {
+		t0 := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+		t1 := t0.Add(24 * time.Hour)
+		t2 := t0.Add(48 * time.Hour)
+		issues := []*Issue{
+			// Oldest update but highest priority — must still sort last by update time.
+			{ID: "1", Title: "Old Critical", Status: "todo", Priority: "critical", UpdatedAt: &t0},
+			{ID: "2", Title: "Newest Low", Status: "todo", Priority: "low", UpdatedAt: &t2},
+			{ID: "3", Title: "Mid Normal", Status: "todo", Priority: "normal", UpdatedAt: &t1},
+		}
+
+		SortByStatusPriorityAndType(issues, statusNames, priorityNames, typeNames)
+
+		// Within the same status, newest updated first regardless of priority.
+		expectedOrder := []string{"Newest Low", "Mid Normal", "Old Critical"}
+		for i, expected := range expectedOrder {
+			if issues[i].Title != expected {
+				t.Errorf("issues[%d].Title = %q, want %q", i, issues[i].Title, expected)
+			}
+		}
+	})
+
+	t.Run("priority breaks ties when updated dates are equal", func(t *testing.T) {
+		ts := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+		issues := []*Issue{
+			{ID: "1", Title: "Low", Status: "todo", Priority: "low", UpdatedAt: &ts},
+			{ID: "2", Title: "Critical", Status: "todo", Priority: "critical", UpdatedAt: &ts},
+		}
+
+		SortByStatusPriorityAndType(issues, statusNames, priorityNames, typeNames)
+
+		if issues[0].Title != "Critical" {
+			t.Errorf("First issue = %q, want \"Critical\"", issues[0].Title)
+		}
+	})
+
+	t.Run("falls back to created date when updated date is unset", func(t *testing.T) {
+		older := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+		newer := older.Add(24 * time.Hour)
+		issues := []*Issue{
+			// No updated_at, but a newer created_at — must win via fallback.
+			{ID: "1", Title: "NewCreated", Status: "todo", Priority: "low", CreatedAt: &newer},
+			{ID: "2", Title: "OldUpdated", Status: "todo", Priority: "critical", UpdatedAt: &older},
+		}
+
+		SortByStatusPriorityAndType(issues, statusNames, priorityNames, typeNames)
+
+		if issues[0].Title != "NewCreated" {
+			t.Errorf("First issue = %q, want \"NewCreated\"", issues[0].Title)
+		}
+	})
+
+	t.Run("issues without any date sort last", func(t *testing.T) {
+		ts := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+		issues := []*Issue{
+			{ID: "1", Title: "NoDate", Status: "todo", Priority: "critical"},
+			{ID: "2", Title: "HasDate", Status: "todo", Priority: "low", UpdatedAt: &ts},
+		}
+
+		SortByStatusPriorityAndType(issues, statusNames, priorityNames, typeNames)
+
+		if issues[0].Title != "HasDate" {
+			t.Errorf("First issue = %q, want \"HasDate\"", issues[0].Title)
+		}
+	})
+
 	t.Run("sorts by priority within same status", func(t *testing.T) {
 		issues := []*Issue{
 			{ID: "1", Title: "E Low", Status: "todo", Priority: "low"},

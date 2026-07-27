@@ -1,5 +1,11 @@
 # Changelog
 
+## Week of Jul 26 – Aug 1, 2026
+
+### ✨ Features
+
+- The default issue sort now orders by activity date (most recently updated, falling back to created) within each status, ahead of priority, type, and title, so recently touched issues surface first
+
 ## Week of Jul 19 – Jul 25, 2026
 
 ### ✨ Features
