@@ -42,6 +42,13 @@ var primeCmd = &cobra.Command{
 			if err != nil || configFile == "" {
 				return nil
 			}
+			// A .jig.yaml may exist purely for cite/nope/brew/etc. If it has
+			// no todo section, todo functionality is irrelevant to this
+			// project, so emit nothing rather than priming agents with an
+			// issue-tracking guide they can't use.
+			if !todoconfig.HasTodoSection(configFile) {
+				return nil
+			}
 			primeCfg, _ = todoconfig.Load(configFile)
 		} else {
 			cp := configPath()

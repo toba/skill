@@ -332,6 +332,33 @@ func isLegacyConfig(configPath string) bool {
 	return filepath.Base(configPath) == LegacyConfigFileName
 }
 
+// HasTodoSection reports whether the config file at the given path actually
+// contains todo configuration. This is distinct from Load, which always
+// returns a defaulted Config even when the file has no todo section — callers
+// (e.g. `jig prime`) use this to decide whether todo functionality is
+// relevant to the project at all.
+//
+// The legacy .todo.yml format is todo-only, so it always counts as present.
+// For .jig.yaml / .toba.yaml the top-level "todo:" key must exist.
+func HasTodoSection(configPath string) bool {
+	if configPath == "" {
+		return false
+	}
+	if isLegacyConfig(configPath) {
+		return true
+	}
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		return false
+	}
+	var top map[string]yaml.Node
+	if err := yaml.Unmarshal(data, &top); err != nil {
+		return false
+	}
+	_, ok := top["todo"]
+	return ok
+}
+
 // LoadFromDirectory finds and loads the config file by searching upward from the given directory.
 // If no config file is found, returns a default config anchored at the given directory.
 func LoadFromDirectory(startDir string) (*Config, error) {

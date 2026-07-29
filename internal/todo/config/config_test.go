@@ -1339,3 +1339,44 @@ func TestSyncConfig(t *testing.T) {
 		}
 	})
 }
+
+func TestHasTodoSection(t *testing.T) {
+	t.Run("todo section present", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, ConfigFileName)
+		if err := os.WriteFile(p, []byte("todo:\n    default_type: task\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if !HasTodoSection(p) {
+			t.Errorf("HasTodoSection = false, want true")
+		}
+	})
+
+	t.Run("todo section absent (other sections only)", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, ConfigFileName)
+		if err := os.WriteFile(p, []byte("nope:\n    rules: []\ncitations:\n    sources: []\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if HasTodoSection(p) {
+			t.Errorf("HasTodoSection = true, want false")
+		}
+	})
+
+	t.Run("empty path", func(t *testing.T) {
+		if HasTodoSection("") {
+			t.Errorf("HasTodoSection(\"\") = true, want false")
+		}
+	})
+
+	t.Run("legacy .todo.yml counts as present", func(t *testing.T) {
+		dir := t.TempDir()
+		p := filepath.Join(dir, LegacyConfigFileName)
+		if err := os.WriteFile(p, []byte("issues:\n    path: .issues\n"), 0644); err != nil {
+			t.Fatal(err)
+		}
+		if !HasTodoSection(p) {
+			t.Errorf("HasTodoSection(legacy) = false, want true")
+		}
+	})
+}
