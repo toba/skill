@@ -4,6 +4,7 @@
 
 ### ✨ Features
 
+- `jig prime` now omits the issue-tracking guide when a project's `.jig.yaml` has no `todo:` section; a new `HasTodoSection` detector gates the output so projects using jig only for `cite`/`nope`/`brew` don't prime agents with an irrelevant guide
 - The default issue sort now orders by activity date (most recently updated, falling back to created) within each status, ahead of priority, type, and title, so recently touched issues surface first
 
 ## Week of Jul 19 – Jul 25, 2026
