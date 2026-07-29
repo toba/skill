@@ -98,7 +98,7 @@ func newSortPickerModel(currentOrder sortOrder, width, height int) sortPickerMod
 		value       sortOrder
 		description string
 	}{
-		{"Default", sortDefault, "Status, priority, type, then title"},
+		{"Default", sortDefault, "Status, last activity, priority, type, then title"},
 		{"Status", sortStatus, "Status order, then newest created"},
 		{"Priority", sortPriority, "Priority order, then newest created"},
 		{"Created", sortCreated, "Newest created first"},

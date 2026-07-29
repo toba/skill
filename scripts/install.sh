@@ -1,11 +1,27 @@
 #!/usr/bin/env bash
+# Build the current source and install it as the global `jig`, shadowing the
+# Homebrew release. Targets the Homebrew symlink (never its realpath) so the
+# versioned Cellar binary is left intact. Restore the release at any time with:
+#   brew link --overwrite jig
 set -euo pipefail
 
-target="$(realpath "$(brew --prefix jig)/bin/jig")"
+target="$(brew --prefix)/bin/jig"
+ver="$(git describe --tags --always --dirty 2>/dev/null || echo dev)"
+commit="$(git rev-parse --short HEAD 2>/dev/null || echo none)"
+built="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
 tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
 
-go build -ldflags "-X github.com/toba/jig/cmd.ver=dev" -o "$tmp" .
-install -m 755 "$tmp" "$target"
+go build -ldflags "\
+  -X github.com/toba/jig/cmd.ver=${ver} \
+  -X github.com/toba/jig/cmd.commit=${commit} \
+  -X github.com/toba/jig/cmd.date=${built}" -o "${tmp}" .
 
-echo "Installed to $target"
+# `install` follows symlinks, which would write through to the Cellar binary and
+# corrupt the Homebrew install. Remove the symlink first, then drop in our build.
+rm -f "${target}"
+install -m 755 "${tmp}" "${target}"
+
+echo "Installed ${ver} (${commit}) to ${target}"
+echo "Restore the Homebrew release with: brew link --overwrite jig"
