@@ -306,9 +306,13 @@ func RemoveAliasDir(c *Config, name string) error {
 	return os.RemoveAll(a.Path)
 }
 
-// SeedClaudeJSON copies .claude.json from the shared source into the alias
-// dir if absent. Claude refuses to launch without this file, and it is in
-// the private list so it is not symlinked.
+// SeedClaudeJSON seeds an alias's .claude.json (if absent) from the shared
+// source. Claude refuses to launch without this file, and it is in the private
+// list so it is not symlinked. The source copy is scrubbed of IdentityFields
+// (machineID, userID, oauthAccount) so a fresh alias for a different account
+// does not inherit the source account's identity — each account regenerates
+// its own on first login. This keeps accounts isolated; it does not hide
+// anything from Anthropic.
 func SeedClaudeJSON(c *Config, name string) error {
 	a, ok := c.Aliases[name]
 	if !ok {
@@ -322,13 +326,18 @@ func SeedClaudeJSON(c *Config, name string) error {
 		return nil
 	}
 	src := filepath.Join(c.SharedSource, ".claude.json")
-	if _, err := os.Lstat(src); err != nil {
+	data, err := os.ReadFile(src)
+	if err != nil {
 		return nil //nolint:nilerr // source absent: nothing to seed, not an error
+	}
+	scrubbed, err := scrubIdentity(data)
+	if err != nil {
+		return fmt.Errorf("scrubbing identity from %s: %w", src, err)
 	}
 	if err := os.MkdirAll(a.Path, 0o755); err != nil {
 		return err
 	}
-	return copyFile(src, dst)
+	return os.WriteFile(dst, scrubbed, 0o644)
 }
 
 // EnsureAliasDirs walks the configured alias map and ensures each non-source

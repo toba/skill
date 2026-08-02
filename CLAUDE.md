@@ -27,6 +27,7 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
   - `brew` parent with `init`, `doctor` subcommands — Homebrew tap management
   - `scoop` parent with `init`, `doctor` subcommands — Scoop bucket management
   - `zed` parent with `init`, `doctor` subcommands — Zed extension management
+  - `cc` parent (`init`, `add`, `list`, `login`, `<alias>` launch) — run multiple Claude Code profiles from one machine, sharing agents/skills/commands while keeping each profile's credentials and identity separate
   - `prime` — output instructions for AI coding agents
   - `doctor` — run all doctor checks (nope, brew, scoop, zed)
   - `help-all` — show all commands and flags in agent-friendly format
@@ -44,6 +45,7 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
 - `internal/brew/` — Homebrew tap init and doctor logic
 - `internal/scoop/` — Scoop bucket init and doctor logic
 - `internal/zed/` — Zed extension init and doctor logic
+- `internal/cc/` — multi-profile Claude Code management: detect `~/.claude*` dirs, symlink shared config, isolate per-alias private files
 - `internal/update/` — migration logic for legacy config files
 - `internal/todo/config/` — todo config (reads `todo:` section from `.jig.yaml`, Node API for partial writes)
 - `internal/todo/core/` — issue CRUD, archive, link checking, file watcher
@@ -78,4 +80,5 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
 - `todo` stores issues as markdown files with YAML frontmatter in `.issues/`
 - `todo` milestones are first-class entities (NOT an issue type), stored as files in `.issues/milestones/` (skipped by the issue loader); an issue references one via its `milestone:` frontmatter field (a milestone ID). The TUI shows the milestone short name as a badge, `m` reassigns, `g m` filters. GitHub sync maps milestone entities ↔ GitHub milestones (number stored on the milestone file's `sync.github`). The legacy `milestone` issue *type* is retired; `jig todo milestone migrate` converts old `type: milestone` issues into entities
 - `todo` supports GraphQL queries/mutations via embedded gqlgen schema
+- `cc` exists to let one developer run several *legitimately-held* Claude Code accounts (e.g. personal + work) from a single machine without re-installing agents/skills/commands for each. It is a convenience/DRY tool, NOT a mechanism to circumvent Anthropic usage policies, rate limits, or anti-fraud systems. Design principle: **share tooling, isolate identity.** Shared config (`agents`, `skills`, `commands`, `CLAUDE.md`, `projects`) is symlinked from one source dir; each alias keeps its own *real* copies of the `DefaultPrivate` files (`.credentials.json`, `.claude.json`, `statsig`, `telemetry`, caches). Anything that identifies or authenticates a specific account MUST stay per-alias and MUST NOT be shared or copied between accounts — most importantly the stable `machineID` and `userID` fields inside `.claude.json`, plus `oauthAccount` and the `statsig`/`telemetry` device IDs. Seeding a new alias's `.claude.json` from another account's file (see `SeedClaudeJSON`) must strip these identity fields so each account regenerates its own; sharing them makes two distinct accounts look like one install, which is exactly the cross-account linkage this tool must avoid
 - `tui` and `sync` have top-level aliases that call `initTodoCore()` in their own PreRunE; the root command's `RunE` opens the TUI for bare `jig` (guarded by `cobra.NoArgs` so unknown subcommands still error)

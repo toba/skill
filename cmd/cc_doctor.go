@@ -40,8 +40,20 @@ var ccDoctorCmd = &cobra.Command{
 				bad++
 			}
 		}
+		// Cross-alias identity check: distinct accounts sharing a machineID or
+		// userID look like one install to Anthropic's anti-fraud. Flag it.
+		collisions, err := cc.CheckIdentity(c)
+		if err != nil {
+			return err
+		}
 		if jsonOut {
-			return cc.EmitJSON(cc.JSONResponse{Success: bad == 0, Data: results})
+			return cc.EmitJSON(cc.JSONResponse{
+				Success: bad == 0 && len(collisions) == 0,
+				Data: map[string]any{
+					"health":              results,
+					"identity_collisions": collisions,
+				},
+			})
 		}
 		for n, h := range results {
 			fmt.Printf("%s: %d valid, %d broken, %d missing, %d conflicts, %d orphaned\n",
@@ -59,11 +71,24 @@ var ccDoctorCmd = &cobra.Command{
 				fmt.Printf("    orphaned: %s\n", x)
 			}
 		}
-		if bad > 0 {
+		for _, col := range collisions {
+			fmt.Printf("identity: aliases %v share %s %s — each account must have its own; run `jig cc login <alias>` to regenerate\n",
+				col.Aliases, col.Field, maskID(col.Value))
+		}
+		if bad > 0 || len(collisions) > 0 {
 			return nope.ExitError{Code: 1}
 		}
 		return nil
 	},
+}
+
+// maskID shortens a stable identifier for display so full machineID/userID
+// values are not printed to the terminal.
+func maskID(v string) string {
+	if len(v) <= 8 {
+		return v
+	}
+	return v[:8] + "…"
 }
 
 func init() {

@@ -1,5 +1,11 @@
 # Changelog
 
+## Week of Aug 2 – Aug 8, 2026
+
+### 🐞 Fixes
+
+- `jig cc` no longer seeds a fresh alias's `.claude.json` by verbatim-copying the source account's file; `SeedClaudeJSON` now strips the account/install identity fields (`machineID`, `userID`, `oauthAccount`) so each profile regenerates its own on first login, and `jig cc doctor` gained a check that flags any two aliases sharing a `machineID`/`userID`
+
 ## Week of Jul 26 – Aug 1, 2026
 
 ### ✨ Features
