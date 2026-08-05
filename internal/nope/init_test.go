@@ -54,11 +54,11 @@ func TestRunInit(t *testing.T) {
 				if entry["matcher"] != ".*" {
 					t.Errorf("matcher = %q, want %q", entry["matcher"], ".*")
 				}
-				// Verify command is "jig nope"
+				// Verify command is "jigo nope"
 				innerHooks := entry["hooks"].([]any)
 				hm := innerHooks[0].(map[string]any)
-				if hm["command"] != "jig nope" {
-					t.Errorf("command = %q, want %q", hm["command"], "jig nope")
+				if hm["command"] != "jigo nope" {
+					t.Errorf("command = %q, want %q", hm["command"], "jigo nope")
 				}
 			},
 		},
@@ -195,7 +195,7 @@ func TestRunInit(t *testing.T) {
 					"hooks": []any{
 						map[string]any{
 							"type":    "command",
-							"command": "jig nope",
+							"command": "jigo nope",
 						},
 					},
 				}
@@ -231,7 +231,7 @@ func TestRunInit(t *testing.T) {
 			},
 		},
 		{
-			name: "migrates nogo command to ja nope",
+			name: "migrates nogo command to jigo nope",
 			setup: func(t *testing.T, dir string) {
 				if err := os.MkdirAll(filepath.Join(dir, ".claude"), 0o750); err != nil {
 					t.Fatal(err)
@@ -273,8 +273,61 @@ func TestRunInit(t *testing.T) {
 				entry := ptu[0].(map[string]any)
 				innerHooks := entry["hooks"].([]any)
 				hm := innerHooks[0].(map[string]any)
-				if hm["command"] != "jig nope" {
-					t.Errorf("command = %q, want %q", hm["command"], "jig nope")
+				if hm["command"] != "jigo nope" {
+					t.Errorf("command = %q, want %q", hm["command"], "jigo nope")
+				}
+			},
+		},
+		{
+			// The binary was renamed jig → jigo; existing installs carry the old
+			// hook command and must be rewritten in place.
+			name: "migrates jig nope command to jigo nope",
+			setup: func(t *testing.T, dir string) {
+				if err := os.MkdirAll(filepath.Join(dir, ".claude"), 0o750); err != nil {
+					t.Fatal(err)
+				}
+				oldHook := map[string]any{
+					"matcher": ".*",
+					"hooks": []any{
+						map[string]any{
+							"type":    "command",
+							"command": "jig nope",
+						},
+					},
+				}
+				s := map[string]any{
+					"hooks": map[string]any{
+						"PreToolUse": []any{oldHook},
+					},
+				}
+				data, err := json.MarshalIndent(s, "", "  ")
+				if err != nil {
+					t.Fatal(err)
+				}
+				if err := os.WriteFile(filepath.Join(dir, ".claude", "settings.json"), data, 0o600); err != nil {
+					t.Fatal(err)
+				}
+			},
+			wantExit: 0,
+			checkSettings: func(t *testing.T, dir string) {
+				data, err := os.ReadFile(filepath.Join(dir, ".claude", "settings.json")) //nolint:gosec // test path
+				if err != nil {
+					t.Fatal(err)
+				}
+				var s map[string]any
+				if err := json.Unmarshal(data, &s); err != nil {
+					t.Fatal(err)
+				}
+				hooks := s["hooks"].(map[string]any)
+				ptu := hooks["PreToolUse"].([]any)
+				if len(ptu) != 1 {
+					t.Fatalf("PreToolUse entries = %d, want 1 (should rewrite, not append)", len(ptu))
+				}
+				entry := ptu[0].(map[string]any)
+				innerHooks := entry["hooks"].([]any)
+				hm := innerHooks[0].(map[string]any)
+				if hm["command"] != "jigo nope" {
+					t.Errorf("command = %q, want %q", hm["command"], "jigo nope")
 				}
 			},
 		},

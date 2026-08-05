@@ -6,7 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 	commitpkg "github.com/toba/jig/internal/commit"
-	"github.com/toba/jig/internal/config"
 	"github.com/toba/jig/internal/nope"
 )
 
@@ -43,14 +42,7 @@ Exit codes:
 			return nope.ExitError{Code: 2}
 		}
 
-		// 2. Todo sync (if configured) — off by default; opt in with --sync.
-		//    The full external sync (e.g. ClickUp) is slow and does not belong on
-		//    the commit hot path; run `jig todo sync` on its own cadence instead.
-		if commitSync {
-			syncTodoIfConfigured(cmd)
-		}
-
-		// 3. Stage all changes.
+		// 2. Stage all changes.
 		status, err := commitpkg.StageAll()
 		if err != nil {
 			return err
@@ -60,7 +52,7 @@ Exit codes:
 			fmt.Println(status)
 		}
 
-		// 4. Diff.
+		// 3. Diff.
 		diff, err := commitpkg.Diff()
 		if err != nil {
 			return err
@@ -71,7 +63,7 @@ Exit codes:
 			fmt.Println(diff)
 		}
 
-		// 5. Latest version tag.
+		// 4. Latest version tag.
 		tag, err := commitpkg.LatestTag()
 		if err != nil {
 			return err
@@ -83,7 +75,7 @@ Exit codes:
 			fmt.Println("LATEST_VERSION:", tag)
 		}
 
-		// 6. Recent commits (for commit message style reference).
+		// 5. Recent commits (for commit message style reference).
 		log, err := commitpkg.RecentCommits(tag)
 		if err != nil {
 			return err
@@ -102,7 +94,6 @@ var (
 	applyMessage string
 	applyVersion string
 	applyPush    bool
-	commitSync   bool
 )
 
 var applyCmd = &cobra.Command{
@@ -112,17 +103,7 @@ var applyCmd = &cobra.Command{
 and pushes to the remote.`,
 	Args: cobra.NoArgs,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		// 1. Sync todo before commit — off by default; opt in with --sync.
-		if commitSync {
-			syncTodoIfConfigured(cmd)
-		}
-
-		// Re-stage .issues/ in case sync modified files after gather staged them.
-		if err := commitpkg.RestageIssues(); err != nil {
-			fmt.Fprintf(cmd.ErrOrStderr(), "warning: restage issues: %v\n", err) //nolint:errcheck // warning output
-		}
-
-		// 2. Commit (skip if nothing staged and push was requested).
+		// 1. Commit (skip if nothing staged and push was requested).
 		staged, err := commitpkg.HasStagedChanges()
 		if err != nil {
 			return err
@@ -139,7 +120,7 @@ and pushes to the remote.`,
 			fmt.Println("Nothing to commit.")
 		}
 
-		// 3. Tag if version provided.
+		// 2. Tag if version provided.
 		if applyVersion != "" {
 			if err := commitpkg.Tag(applyVersion); err != nil {
 				return err
@@ -147,7 +128,7 @@ and pushes to the remote.`,
 			fmt.Printf("Tagged %s.\n", applyVersion)
 		}
 
-		// 4. Push if requested.
+		// 3. Push if requested.
 		if applyPush {
 			if err := commitpkg.Push(); err != nil {
 				return err
@@ -155,7 +136,7 @@ and pushes to the remote.`,
 			fmt.Println("Pushed.")
 		}
 
-		// 5. Final status.
+		// 4. Final status.
 		status, err := commitpkg.Status()
 		if err != nil {
 			return err
@@ -178,40 +159,7 @@ func init() {
 	applyCmd.Flags().StringVarP(&applyVersion, "version", "v", "", "version tag to create")
 	applyCmd.Flags().BoolVar(&applyPush, "push", false, "push commits and tags after committing")
 
-	// Off by default: the external issue sync (ClickUp/GitHub) is slow and does
-	// not belong on the commit hot path. Opt in per-invocation with --sync.
-	gatherCmd.Flags().BoolVar(&commitSync, "sync", false, "sync issues to external integrations before staging")
-	applyCmd.Flags().BoolVar(&commitSync, "sync", false, "sync issues to external integrations before committing")
-
 	commitCmd.AddCommand(gatherCmd)
 	commitCmd.AddCommand(applyCmd)
 	rootCmd.AddCommand(commitCmd)
-}
-
-// syncTodoIfConfigured runs todo sync if .jig.yaml has a sync section configured.
-// Errors are logged to stderr but not propagated — sync is best-effort during commits.
-func syncTodoIfConfigured(cmd *cobra.Command) {
-	if !hasTodoSync(configPath()) {
-		return
-	}
-	if err := initTodoCore(cmd); err != nil {
-		fmt.Fprintf(cmd.ErrOrStderr(), "warning: todo sync init: %v\n", err) //nolint:errcheck // warning output
-		return
-	}
-	if err := runSync(cmd, nil); err != nil {
-		fmt.Fprintf(cmd.ErrOrStderr(), "warning: todo sync: %v\n", err) //nolint:errcheck // warning output
-	}
-}
-
-// hasTodoSync checks whether .jig.yaml has a todo.sync section.
-func hasTodoSync(path string) bool {
-	doc, err := config.LoadDocument(path)
-	if err != nil {
-		return false
-	}
-	todoNode := config.FindKey(doc.Root, "todo")
-	if todoNode == nil {
-		return false
-	}
-	return config.FindKey(todoNode, "sync") != nil
 }

@@ -1,9 +1,9 @@
 version: 2
 
-project_name: jig
+project_name: jigo
 
 builds:
-  - binary: jig
+  - binary: jigo
     env:
       - CGO_ENABLED=0
     goos:

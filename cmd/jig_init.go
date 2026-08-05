@@ -12,9 +12,8 @@ var skipStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("3")).Faint(true) 
 
 var jigInitCmd = &cobra.Command{
 	Use:   "init",
-	Short: "Initialize a new jig project",
+	Short: "Initialize a new jigo project",
 	Long: `Creates .jig.yaml and runs all init subcommands:
-  todo  — creates .issues/ directory and todo config section
   nope  — writes nope rules and .claude/settings.json hook
   cite  — adds starter citations section
   brew  — creates companion tap repo (skipped if not configured)
@@ -28,7 +27,6 @@ Safe to run multiple times; each init is idempotent.`,
 			remote bool // remote inits always skip on error
 		}
 		steps := []step{
-			{"todo", todoInitCmd, false},
 			{"nope", nopeInitCmd, false},
 			{"cite", initCmd, false},
 			{"brew", brewInitCmd, true},

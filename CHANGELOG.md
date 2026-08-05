@@ -2,7 +2,10 @@
 
 ## Week of Aug 2 – Aug 8, 2026
 
-### 🐞 Fixes
+### 💥 Breaking
+
+- The binary and distributed package are renamed `jig` → `jigo` (`brew install toba/tap/jigo`, `scoop install jigo`). The Go module path, GitHub repo, and `.jig.yaml` config filename are unchanged. The release workflow now removes the old `Formula/jig.rb` and `jig.json` from the tap and bucket so they stop serving stale versions, and `nope init` rewrites an existing `jig nope` hook in `.claude/settings.json` to `jigo nope`
+- Remove the `todo` issue tracker and everything built on it: the `todo` command tree, the `sync` and `tui` top-level aliases, ClickUp/GitHub issue sync, the GraphQL schema and `pkg/client` library, the Bleve search index, and the `todo:` section of `.jig.yaml`. `jig changelog` and `jig prime` are removed as well — both existed only to serve the tracker. `commit gather`/`commit apply` lose their `--sync` flag and no longer restage `.issues/`
 
 - `jig cc` no longer seeds a fresh alias's `.claude.json` by verbatim-copying the source account's file; `SeedClaudeJSON` now strips the account/install identity fields (`machineID`, `userID`, `oauthAccount`) so each profile regenerates its own on first login, and `jig cc doctor` gained a check that flags any two aliases sharing a `machineID`/`userID`
 

@@ -11,9 +11,11 @@ import (
 	"github.com/toba/jig/internal/config"
 	"github.com/toba/jig/internal/display"
 	"github.com/toba/jig/internal/github"
-	"github.com/toba/jig/internal/todo/issue"
 	"golang.org/x/sync/errgroup"
 )
+
+// commitDateFormat is the date layout used when rendering commit dates.
+const commitDateFormat = "2006-01-02"
 
 var reviewWithDiffs bool
 
@@ -111,7 +113,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 	}
 	wg.Wait()
 
-	// review is read-only: it never advances last_checked. Use `jig cite mark`
+	// review is read-only: it never advances last_checked. Use `jigo cite mark`
 	// to record what you've reviewed. This keeps review idempotent so an agent
 	// can re-run it (or recover from lost output) without losing the changes.
 
@@ -309,7 +311,7 @@ func buildCommitResults(commits []github.Commit, fileResults []classify.Result, 
 			Message: c.Message,
 			Body:    c.Body,
 			Author:  c.Author,
-			Date:    c.Date.Format(issue.DueDateFormat),
+			Date:    c.Date.Format(commitDateFormat),
 			Level:   level,
 		})
 	}

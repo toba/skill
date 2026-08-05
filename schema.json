@@ -11,7 +11,9 @@
       "description": "List of cited repositories to monitor.",
       "items": {
         "type": "object",
-        "required": ["repo"],
+        "required": [
+          "repo"
+        ],
         "additionalProperties": false,
         "properties": {
           "repo": {
@@ -45,17 +47,23 @@
               "high": {
                 "type": "array",
                 "description": "High-priority file glob patterns.",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               },
               "medium": {
                 "type": "array",
                 "description": "Medium-priority file glob patterns.",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               },
               "low": {
                 "type": "array",
                 "description": "Low-priority file glob patterns.",
-                "items": { "type": "string" }
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -76,7 +84,10 @@
           "description": "Guard rules evaluated against tool invocations.",
           "items": {
             "type": "object",
-            "required": ["name", "message"],
+            "required": [
+              "name",
+              "message"
+            ],
             "additionalProperties": false,
             "properties": {
               "name": {
@@ -107,133 +118,29 @@
               "tools": {
                 "type": "array",
                 "description": "Tools this rule applies to. Defaults to [\"Bash\"]. Use [\"*\"] for all tools.",
-                "items": { "type": "string" },
-                "default": ["Bash"]
+                "items": {
+                  "type": "string"
+                },
+                "default": [
+                  "Bash"
+                ]
               }
             },
             "oneOf": [
-              { "required": ["pattern"] },
-              { "required": ["builtin"] }
+              {
+                "required": [
+                  "pattern"
+                ]
+              },
+              {
+                "required": [
+                  "builtin"
+                ]
+              }
             ]
           }
         }
       }
-    },
-    "todo": {
-      "type": "object",
-      "description": "Issue tracking configuration for the todo CLI.",
-      "additionalProperties": false,
-      "properties": {
-        "path": {
-          "type": "string",
-          "description": "Relative path to the issues directory.",
-          "default": ".issues"
-        },
-        "default_status": {
-          "type": "string",
-          "description": "Default status for new issues.",
-          "enum": ["in-progress", "ready", "draft", "completed", "scrapped"],
-          "default": "ready"
-        },
-        "default_type": {
-          "type": "string",
-          "description": "Default type for new issues.",
-          "enum": ["milestone", "epic", "bug", "feature", "task"],
-          "default": "task"
-        },
-        "default_sort": {
-          "type": "string",
-          "description": "Default sort order for listing issues.",
-          "enum": ["default", "created", "updated", "due", "status", "priority", "id"],
-          "default": "default"
-        },
-        "editor": {
-          "type": "string",
-          "description": "Editor command override. Falls back to $EDITOR if unset."
-        },
-        "require_if_match": {
-          "type": "boolean",
-          "description": "Require etag-based optimistic locking on updates.",
-          "default": false
-        },
-        "sync": {
-          "type": "object",
-          "description": "External tracker sync integrations.",
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": true
-          },
-          "properties": {
-            "github": {
-              "type": "object",
-              "description": "GitHub Issues sync configuration.",
-              "additionalProperties": false,
-              "properties": {
-                "repo": {
-                  "type": "string",
-                  "description": "GitHub repository in owner/repo format.",
-                  "pattern": "^[^/]+/[^/]+$"
-                }
-              },
-              "required": ["repo"]
-            },
-            "clickup": {
-              "type": "object",
-              "description": "ClickUp sync configuration.",
-              "additionalProperties": true,
-              "properties": {
-                "list_id": {
-                  "type": "string",
-                  "description": "ClickUp list ID."
-                },
-                "assignee": {
-                  "type": "integer",
-                  "description": "ClickUp user ID for auto-assignment."
-                },
-                "status_mapping": {
-                  "type": "object",
-                  "description": "Map issue statuses to ClickUp statuses.",
-                  "additionalProperties": { "type": "string" }
-                },
-                "priority_mapping": {
-                  "type": "object",
-                  "description": "Map issue priorities to ClickUp priority numbers (1-4).",
-                  "additionalProperties": { "type": "integer" }
-                },
-                "type_mapping": {
-                  "type": "object",
-                  "description": "Map issue types to ClickUp type IDs.",
-                  "additionalProperties": { "type": "integer" }
-                },
-                "custom_fields": {
-                  "type": "object",
-                  "description": "Map issue fields to ClickUp custom field UUIDs.",
-                  "additionalProperties": { "type": "string" }
-                },
-                "sync_filter": {
-                  "type": "object",
-                  "description": "Filter which issues to sync.",
-                  "additionalProperties": false,
-                  "properties": {
-                    "exclude_status": {
-                      "type": "array",
-                      "description": "Status names to exclude from sync.",
-                      "items": { "type": "string" }
-                    }
-                  }
-                }
-              },
-              "required": ["list_id"]
-            }
-          }
-        }
-      }
-    },
-    "changelog": {
-      "type": "string",
-      "description": "How often the agent should update CHANGELOG.md. 'per-commit' updates on every commit, 'daily' updates once per day, 'weekly' updates once per week.",
-      "enum": ["per-commit", "daily", "weekly"],
-      "default": "per-commit"
     },
     "companions": {
       "type": "object",

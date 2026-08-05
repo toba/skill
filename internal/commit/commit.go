@@ -270,21 +270,6 @@ func unpushedVersionTags() ([]string, error) {
 	return unpushed, nil
 }
 
-// RestageIssues stages any modified .issues/ files so sync metadata
-// changes are included in the upcoming commit. No-op if the directory
-// doesn't exist or has no changes.
-func RestageIssues() error {
-	if !issuesDirExists() {
-		return nil
-	}
-	return exec.Command("git", "add", "--", ".issues").Run()
-}
-
-func issuesDirExists() bool {
-	_, err := os.Stat(".issues")
-	return err == nil
-}
-
 // Status returns the current git status output.
 func Status() (string, error) {
 	out, err := exec.Command("git", "status", "--short").Output()

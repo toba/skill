@@ -16,11 +16,11 @@ var ccCmd = &cobra.Command{
 agents/skills/commands symlinked from a single source and isolated
 credentials per alias.
 
-  jig cc init                     auto-detect ~/.claude* dirs
-  jig cc add <alias>              create a new alias
-  jig cc list                     list aliases
-  jig cc <alias> [claude flags]   launch claude with that alias
-  jig cc                          interactive picker`,
+  jigo cc init                     auto-detect ~/.claude* dirs
+  jigo cc add <alias>              create a new alias
+  jigo cc list                     list aliases
+  jigo cc <alias> [claude flags]   launch claude with that alias
+  jigo cc                          interactive picker`,
 	DisableFlagParsing: true,
 	SilenceUsage:       true,
 	SilenceErrors:      true,
@@ -29,7 +29,7 @@ credentials per alias.
 
 // ccDispatch handles the parent's RunE. It is called only when no subcommand
 // matched. With DisableFlagParsing the args contain the full original tail
-// after `jig cc`.
+// after `jigo cc`.
 func ccDispatch(cmd *cobra.Command, args []string) error {
 	// Help & no args.
 	if len(args) == 0 {
@@ -62,7 +62,7 @@ func ccLaunchInteractive() error {
 	c, err := cc.Load()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return errors.New("no cc config found; run `jig cc init` first")
+			return errors.New("no cc config found; run `jigo cc init` first")
 		}
 		return err
 	}
@@ -82,7 +82,7 @@ func ccLaunch(query string, extraArgs []string) error {
 	c, err := cc.Load()
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return errors.New("no cc config found; run `jig cc init` first")
+			return errors.New("no cc config found; run `jigo cc init` first")
 		}
 		return err
 	}

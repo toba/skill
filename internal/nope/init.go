@@ -103,7 +103,11 @@ var StarterConfig = `nope:
       message: "writing to credential files not allowed"
 `
 
-const hookCommand = "jig nope"
+const hookCommand = "jigo nope"
+
+// legacyHookCommands are older names for the guard hook that migrateLegacyCommand
+// rewrites to hookCommand. "jig nope" predates the rename to jigo.
+var legacyHookCommands = []string{"jig nope", "ja nope", "skill nope", "nogo"}
 
 var hookEntry = map[string]any{
 	settingsKeyMatcher: ".*",
@@ -261,8 +265,8 @@ func migrateNogoMatcher(settings map[string]any) bool {
 	return changed
 }
 
-// migrateLegacyCommand updates existing hook entries that use "nogo",
-// "skill nope", or "ja nope" command to use "jig nope" instead. Returns true if any change was made.
+// migrateLegacyCommand updates existing hook entries that use any of the
+// legacy command names to use hookCommand instead. Returns true if any change was made.
 func migrateLegacyCommand(settings map[string]any) bool {
 	hooks, _ := settings[settingsKeyHooks].(map[string]any)
 	if hooks == nil {
@@ -282,7 +286,7 @@ func migrateLegacyCommand(settings map[string]any) bool {
 				continue
 			}
 			cmd, _ := hm["command"].(string)
-			if cmd == "nogo" || cmd == "skill nope" || cmd == "ja nope" {
+			if slices.Contains(legacyHookCommands, cmd) {
 				hm["command"] = hookCommand
 				changed = true
 			}
@@ -314,11 +318,11 @@ func hasNopeHook(settings map[string]any) bool {
 	return false
 }
 
-// isNopeCommand returns true if the command is "jig nope", "ja nope", "skill nope", or "nogo".
+// isNopeCommand returns true if the command is hookCommand or any legacy name.
 func isNopeCommand(cmd any) bool {
 	s, ok := cmd.(string)
 	if !ok {
 		return false
 	}
-	return s == hookCommand || s == "skill nope" || s == "ja nope" || s == "nogo"
+	return s == hookCommand || slices.Contains(legacyHookCommands, s)
 }

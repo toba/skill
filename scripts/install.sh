@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Build the current source and install it as the global `jig`, shadowing the
+# Build the current source and install it as the global `jigo`, shadowing the
 # Homebrew release. Targets the Homebrew symlink (never its realpath) so the
 # versioned Cellar binary is left intact. Restore the release at any time with:
-#   brew link --overwrite jig
+#   brew link --overwrite jigo
 set -euo pipefail
 
-target="$(brew --prefix)/bin/jig"
+target="$(brew --prefix)/bin/jigo"
 ver="$(git describe --tags --always --dirty 2>/dev/null || echo dev)"
 commit="$(git rev-parse --short HEAD 2>/dev/null || echo none)"
 built="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -24,4 +24,4 @@ rm -f "${target}"
 install -m 755 "${tmp}" "${target}"
 
 echo "Installed ${ver} (${commit}) to ${target}"
-echo "Restore the Homebrew release with: brew link --overwrite jig"
+echo "Restore the Homebrew release with: brew link --overwrite jigo"

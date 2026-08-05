@@ -16,7 +16,7 @@ var commitCandidates = []struct {
 }
 
 // migrateCommitCommand detects a project commit command or shell script
-// that references scripts/commit.sh and rewrites it to use jig commit.
+// that references scripts/commit.sh and rewrites it to use jigo commit.
 // Returns (migrated bool, error).
 func migrateCommitCommand(_ string) (bool, error) {
 	for _, c := range commitCandidates {
@@ -45,8 +45,8 @@ func tryMigrateCommitCommand(commandPath, scriptPath string) (bool, error) {
 		return false, nil
 	}
 
-	// Check that jig commit exists (it should, since we're running skill).
-	// Rewrite the command to use jig commit instead.
+	// Check that jigo commit exists (it should, since we're running skill).
+	// Rewrite the command to use jigo commit instead.
 	newContent := rewriteCommitCommand(content, scriptPath)
 	if newContent == content {
 		return false, nil // nothing changed
@@ -55,11 +55,11 @@ func tryMigrateCommitCommand(commandPath, scriptPath string) (bool, error) {
 	if err := os.WriteFile(commandPath, []byte(newContent), 0o644); err != nil {
 		return false, fmt.Errorf("writing %s: %w", commandPath, err)
 	}
-	fmt.Fprintf(os.Stderr, "update: rewrote %s to use jig commit\n", commandPath)
+	fmt.Fprintf(os.Stderr, "update: rewrote %s to use jigo commit\n", commandPath)
 
 	// Remove the old script if it exists.
 	if err := os.Remove(scriptPath); err == nil {
-		fmt.Fprintf(os.Stderr, "update: removed %s (replaced by jig commit)\n", scriptPath)
+		fmt.Fprintf(os.Stderr, "update: removed %s (replaced by jigo commit)\n", scriptPath)
 		// Clean up empty scripts/ directory.
 		removeEmptyDir(filepath.Dir(scriptPath))
 	}
@@ -74,19 +74,19 @@ func referencesScript(content, scriptPath string) bool {
 		strings.Contains(content, scriptPath)
 }
 
-// rewriteCommitCommand replaces references to the shell script with jig commit.
+// rewriteCommitCommand replaces references to the shell script with jigo commit.
 func rewriteCommitCommand(content, scriptPath string) string {
 	// Replace command invocations. The commit.md typically has:
 	//   Run `./scripts/commit.sh $ARGUMENTS`
 	// or similar patterns.
 	result := content
 
-	// Replace ./scripts/commit.sh and scripts/commit.sh with jig commit.
-	result = strings.ReplaceAll(result, "./"+scriptPath, "jig commit")
-	result = strings.ReplaceAll(result, scriptPath, "jig commit")
+	// Replace ./scripts/commit.sh and scripts/commit.sh with jigo commit.
+	result = strings.ReplaceAll(result, "./"+scriptPath, "jigo commit")
+	result = strings.ReplaceAll(result, scriptPath, "jigo commit")
 
-	// Clean up doubled "jig commit $ARGUMENTS" → "jig commit $ARGUMENTS" (already fine)
-	// but fix "jig commit $ARGUMENTS" since jig commit takes [push] not $ARGUMENTS.
+	// Clean up doubled "jigo commit $ARGUMENTS" → "jigo commit $ARGUMENTS" (already fine)
+	// but fix "jigo commit $ARGUMENTS" since jigo commit takes [push] not $ARGUMENTS.
 
 	return result
 }

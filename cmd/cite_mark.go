@@ -18,7 +18,7 @@ var markCmd = &cobra.Command{
 	Long: "Advance last_checked_sha/last_checked_date (and last_checked_tag for " +
 		"release-tracked sources) to the current HEAD, so the next review only " +
 		"shows newer changes. Optionally limit to a single source. Run this after " +
-		"reviewing with `jig cite review` (which is read-only and never advances).",
+		"reviewing with `jigo cite review` (which is read-only and never advances).",
 	Args: cobra.MaximumNArgs(1),
 	RunE: runMark,
 }
@@ -110,7 +110,7 @@ func runMark(cmd *cobra.Command, args []string) error {
 	return renderMarkResults(os.Stdout, results)
 }
 
-// markJSON is the machine-readable shape for `jig cite mark --json`.
+// markJSON is the machine-readable shape for `jigo cite mark --json`.
 type markJSON struct {
 	Repo string `json:"repo"`
 	Tag  string `json:"tag,omitempty"`

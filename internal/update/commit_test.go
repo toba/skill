@@ -25,8 +25,8 @@ Ask the user.
 	if strings.Contains(got, "scripts/commit.sh") {
 		t.Error("still contains scripts/commit.sh")
 	}
-	if !strings.Contains(got, "jig commit") {
-		t.Error("missing jig commit")
+	if !strings.Contains(got, "jigo commit") {
+		t.Error("missing jigo commit")
 	}
 }
 
@@ -45,7 +45,7 @@ func TestReferencesScript(t *testing.T) {
 	}{
 		{"Run `./scripts/commit.sh push`", true},
 		{"Run `scripts/commit.sh`", true},
-		{"Run `jig commit`", false},
+		{"Run `jigo commit`", false},
 		{"nothing relevant", false},
 	}
 	for _, tt := range tests {
@@ -101,8 +101,8 @@ func TestTryMigrateCommitCommand(t *testing.T) {
 	if strings.Contains(string(got), "commit.sh") {
 		t.Error("command still references commit.sh")
 	}
-	if !strings.Contains(string(got), "jig commit") {
-		t.Error("command doesn't reference jig commit")
+	if !strings.Contains(string(got), "jigo commit") {
+		t.Error("command doesn't reference jigo commit")
 	}
 
 	// Check the script was removed.
@@ -119,7 +119,7 @@ func TestTryMigrateCommitCommand(t *testing.T) {
 func TestTryMigrateCommitCommandAlreadyMigrated(t *testing.T) {
 	tmp := t.TempDir()
 	cmdPath := filepath.Join(tmp, "commit.md")
-	content := "Run `jig commit $ARGUMENTS`\n"
+	content := "Run `jigo commit $ARGUMENTS`\n"
 	if err := os.WriteFile(cmdPath, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}

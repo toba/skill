@@ -15,7 +15,6 @@ type migration struct {
 
 var migrations = []migration{
 	{sectionKey: "nope", candidates: []string{".claude/nope.yml", ".claude/nope.yaml"}},
-	{sectionKey: "todo", candidates: []string{".todo.yml", ".todo.yaml"}},
 }
 
 // Run discovers legacy config files and merges them into jigPath.
@@ -55,28 +54,13 @@ func Run(jigPath string) error {
 		fmt.Fprintf(os.Stderr, "update: migrated %s → %s (citations section)\n", upPath, jigPath)
 	}
 
-	// Migrate commit command (scripts/commit.sh → jig commit).
+	// Migrate commit command (scripts/commit.sh → jigo commit).
 	commitMigrated, err := migrateCommitCommand(jigPath)
 	if err != nil {
 		return fmt.Errorf("commit command migration: %w", err)
 	}
 
-	// Migrate legacy todo config (issues: + sync: → todo:).
-	todoMigrated, err := migrateTodoConfig(jigPath)
-	if err != nil {
-		return fmt.Errorf("todo config migration: %w", err)
-	}
-
-	// Populate todo.extra_statuses from the configured sync integration.
-	extraMigrated, err := migrateExtraStatuses(jigPath)
-	if err != nil {
-		return fmt.Errorf("extra_statuses migration: %w", err)
-	}
-	if extraMigrated {
-		fmt.Fprintf(os.Stderr, "update: populated todo.extra_statuses in %s\n", jigPath)
-	}
-
-	if len(hits) == 0 && !upMigrated && !commitMigrated && !todoMigrated && !extraMigrated {
+	if len(hits) == 0 && !upMigrated && !commitMigrated {
 		fmt.Fprintln(os.Stderr, "update: no legacy config files found")
 		return nil
 	}

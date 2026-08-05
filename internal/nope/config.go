@@ -106,7 +106,7 @@ func FindConfigPath() (string, error) {
 		dir = parent
 	}
 
-	return "", errors.New("no config found (create .jig.yaml with a nope: section or run `jig nope init`)")
+	return "", errors.New("no config found (create .jig.yaml with a nope: section or run `jigo nope init`)")
 }
 
 // FindAndLoadConfig locates and parses the nope section of .jig.yaml.

@@ -72,7 +72,7 @@ var ccDoctorCmd = &cobra.Command{
 			}
 		}
 		for _, col := range collisions {
-			fmt.Printf("identity: aliases %v share %s %s — each account must have its own; run `jig cc login <alias>` to regenerate\n",
+			fmt.Printf("identity: aliases %v share %s %s — each account must have its own; run `jigo cc login <alias>` to regenerate\n",
 				col.Aliases, col.Field, maskID(col.Value))
 		}
 		if bad > 0 || len(collisions) > 0 {

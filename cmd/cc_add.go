@@ -51,7 +51,7 @@ var ccAddCmd = &cobra.Command{
 		fmt.Printf("Created alias %q at %s\n", name, path)
 		fmt.Printf("  symlinks: %d created, %d skipped\n", len(rep.Created), len(rep.Skipped))
 		if len(rep.Conflicts) > 0 {
-			return errors.New("conflicts: real files in shared positions; resolve with `jig cc rebuild`")
+			return errors.New("conflicts: real files in shared positions; resolve with `jigo cc rebuild`")
 		}
 		return nil
 	},

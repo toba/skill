@@ -35,42 +35,6 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
-			name: "migrates .todo.yml into .jig.yaml and deletes legacy file",
-			setup: func(t *testing.T, dir string) {
-				t.Helper()
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "todo:\n  sync: github\n")
-			},
-			check: func(t *testing.T, dir string) {
-				t.Helper()
-				data := readFile(t, filepath.Join(dir, ".jig.yaml"))
-				if !strings.Contains(data, "todo:") {
-					t.Error(".jig.yaml missing todo section")
-				}
-				assertRemoved(t, filepath.Join(dir, ".todo.yml"))
-			},
-		},
-		{
-			name: "migrates both simultaneously",
-			setup: func(t *testing.T, dir string) {
-				t.Helper()
-				mkdir(t, filepath.Join(dir, ".claude"))
-				writeFile(t, filepath.Join(dir, ".claude/nope.yml"), "nope:\n  rules: []\n")
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "todo:\n  sync: github\n")
-			},
-			check: func(t *testing.T, dir string) {
-				t.Helper()
-				data := readFile(t, filepath.Join(dir, ".jig.yaml"))
-				if !strings.Contains(data, "nope:") {
-					t.Error(".jig.yaml missing nope section")
-				}
-				if !strings.Contains(data, "todo:") {
-					t.Error(".jig.yaml missing todo section")
-				}
-				assertRemoved(t, filepath.Join(dir, ".claude/nope.yml"))
-				assertRemoved(t, filepath.Join(dir, ".todo.yml"))
-			},
-		},
-		{
 			name: "skips when section already exists in .jig.yaml",
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
@@ -94,22 +58,23 @@ func TestRun(t *testing.T) {
 			name: "prefers .yml over .yaml when both exist",
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "todo:\n  sync: github\n")
-				writeFile(t, filepath.Join(dir, ".todo.yaml"), "todo:\n  sync: clickup\n")
+				mkdir(t, filepath.Join(dir, ".claude"))
+				writeFile(t, filepath.Join(dir, ".claude/nope.yml"), "nope:\n  rules:\n    - name: from-yml\n")
+				writeFile(t, filepath.Join(dir, ".claude/nope.yaml"), "nope:\n  rules:\n    - name: from-yaml\n")
 			},
 			check: func(t *testing.T, dir string) {
 				t.Helper()
 				data := readFile(t, filepath.Join(dir, ".jig.yaml"))
-				if !strings.Contains(data, "github") {
+				if !strings.Contains(data, "from-yml") {
 					t.Error("should have used .yml content")
 				}
-				if strings.Contains(data, "clickup") {
+				if strings.Contains(data, "from-yaml") {
 					t.Error("should not have used .yaml content")
 				}
-				assertRemoved(t, filepath.Join(dir, ".todo.yml"))
+				assertRemoved(t, filepath.Join(dir, ".claude/nope.yml"))
 				// .yaml variant should still exist (not touched).
-				if _, err := os.Stat(filepath.Join(dir, ".todo.yaml")); err != nil {
-					t.Error(".todo.yaml should still exist")
+				if _, err := os.Stat(filepath.Join(dir, ".claude/nope.yaml")); err != nil {
+					t.Error(".claude/nope.yaml should still exist")
 				}
 			},
 		},
@@ -133,24 +98,6 @@ func TestRun(t *testing.T) {
 			},
 		},
 		{
-			name: "wraps bare content under todo section when legacy file lacks todo: wrapper",
-			setup: func(t *testing.T, dir string) {
-				t.Helper()
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "sync:\n  provider: github\n  repo: owner/repo\n")
-			},
-			check: func(t *testing.T, dir string) {
-				t.Helper()
-				data := readFile(t, filepath.Join(dir, ".jig.yaml"))
-				if !strings.Contains(data, "todo:\n  sync:") {
-					t.Errorf("expected sync nested under todo:, got:\n%s", data)
-				}
-				if !strings.Contains(data, "    provider: github") {
-					t.Error("sync content not properly indented under todo:")
-				}
-				assertRemoved(t, filepath.Join(dir, ".todo.yml"))
-			},
-		},
-		{
 			name: "no legacy files found — no error, .jig.yaml unchanged",
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
@@ -168,13 +115,14 @@ func TestRun(t *testing.T) {
 			name: "creates .jig.yaml if it doesn't exist",
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "todo:\n  sync: github\n")
+				mkdir(t, filepath.Join(dir, ".claude"))
+				writeFile(t, filepath.Join(dir, ".claude/nope.yml"), "nope:\n  rules: []\n")
 			},
 			check: func(t *testing.T, dir string) {
 				t.Helper()
 				data := readFile(t, filepath.Join(dir, ".jig.yaml"))
-				if !strings.Contains(data, "todo:") {
-					t.Error(".jig.yaml should have been created with todo section")
+				if !strings.Contains(data, "nope:") {
+					t.Error(".jig.yaml should have been created with nope section")
 				}
 			},
 		},
@@ -183,7 +131,8 @@ func TestRun(t *testing.T) {
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
 				writeFile(t, filepath.Join(dir, ".jig.yaml"), "citations:\n  sources:\n    - repo: foo/bar\n")
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "todo:\n  sync: github\n")
+				mkdir(t, filepath.Join(dir, ".claude"))
+				writeFile(t, filepath.Join(dir, ".claude/nope.yml"), "nope:\n  rules: []\n")
 			},
 			check: func(t *testing.T, dir string) {
 				t.Helper()
@@ -194,8 +143,8 @@ func TestRun(t *testing.T) {
 				if !strings.Contains(data, "foo/bar") {
 					t.Error("existing citations content was lost")
 				}
-				if !strings.Contains(data, "todo:") {
-					t.Error("todo section not appended")
+				if !strings.Contains(data, "nope:") {
+					t.Error("nope section not appended")
 				}
 			},
 		},
@@ -203,7 +152,8 @@ func TestRun(t *testing.T) {
 			name: "idempotent: second run finds nothing to do",
 			setup: func(t *testing.T, dir string) {
 				t.Helper()
-				writeFile(t, filepath.Join(dir, ".todo.yml"), "todo:\n  sync: github\n")
+				mkdir(t, filepath.Join(dir, ".claude"))
+				writeFile(t, filepath.Join(dir, ".claude/nope.yml"), "nope:\n  rules: []\n")
 				// First run.
 				if err := Run(filepath.Join(dir, ".jig.yaml")); err != nil {
 					t.Fatalf("first run: %v", err)
@@ -212,12 +162,12 @@ func TestRun(t *testing.T) {
 			check: func(t *testing.T, dir string) {
 				t.Helper()
 				data := readFile(t, filepath.Join(dir, ".jig.yaml"))
-				if !strings.Contains(data, "todo:") {
-					t.Error("todo section missing after second run")
+				if !strings.Contains(data, "nope:") {
+					t.Error("nope section missing after second run")
 				}
 				// Count occurrences — should be exactly one.
-				if strings.Count(data, "todo:") != 1 {
-					t.Error("todo section duplicated")
+				if strings.Count(data, "nope:") != 1 {
+					t.Error("nope section duplicated")
 				}
 			},
 		},
