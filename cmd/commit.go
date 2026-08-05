@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	commitpkg "github.com/toba/jig/internal/commit"
-	"github.com/toba/jig/internal/nope"
+	commitpkg "github.com/toba/jig-go/v4/internal/commit"
+	"github.com/toba/jig-go/v4/internal/nope"
 )
 
 var commitCmd = &cobra.Command{

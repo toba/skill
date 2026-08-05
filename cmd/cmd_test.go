@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/toba/jig/internal/config"
+	"github.com/toba/jig-go/v4/internal/config"
 )
 
 // writeTempConfig creates a .jig.yaml with the given content in a temp dir and returns the path.

@@ -1,4 +1,4 @@
-module github.com/toba/jig
+module github.com/toba/jig-go/v4
 
 go 1.26
 

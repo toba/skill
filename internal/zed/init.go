@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/toba/jig/internal/companion"
+	"github.com/toba/jig-go/v4/internal/companion"
 )
 
 // InitOpts holds the inputs for zed init.

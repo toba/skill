@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/toba/jig/internal/constants"
+	"github.com/toba/jig-go/v4/internal/constants"
 )
 
 // Settings JSON keys used in .claude/settings.json hook entries.

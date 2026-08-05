@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"charm.land/lipgloss/v2"
-	"github.com/toba/jig/internal/classify"
-	"github.com/toba/jig/internal/config"
+	"github.com/toba/jig-go/v4/internal/classify"
+	"github.com/toba/jig-go/v4/internal/config"
 )
 
 var (

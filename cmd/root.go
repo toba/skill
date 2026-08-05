@@ -6,9 +6,9 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/toba/jig/internal/config"
-	"github.com/toba/jig/internal/constants"
-	"github.com/toba/jig/internal/nope"
+	"github.com/toba/jig-go/v4/internal/config"
+	"github.com/toba/jig-go/v4/internal/constants"
+	"github.com/toba/jig-go/v4/internal/nope"
 )
 
 var (

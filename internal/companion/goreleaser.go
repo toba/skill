@@ -3,7 +3,7 @@ package companion
 import (
 	"os"
 
-	"github.com/toba/jig/internal/constants"
+	"github.com/toba/jig-go/v4/internal/constants"
 )
 
 // CheckGoreleaserExists looks for .goreleaser.yaml or .goreleaser.yml in the

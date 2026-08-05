@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/toba/jig/internal/constants"
+	"github.com/toba/jig-go/v4/internal/constants"
 )
 
 // Language describes the project language and its release conventions.

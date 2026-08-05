@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/toba/jig/internal/companion"
+	"github.com/toba/jig-go/v4/internal/companion"
 )
 
 func TestGenerateWorkflowJob(t *testing.T) {

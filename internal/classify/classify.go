@@ -2,7 +2,7 @@ package classify
 
 import (
 	"github.com/bmatcuk/doublestar/v4"
-	"github.com/toba/jig/internal/config"
+	"github.com/toba/jig-go/v4/internal/config"
 )
 
 // Level represents the relevance level of a file change.

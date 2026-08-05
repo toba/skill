@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/toba/jig/schema.json",
+  "$id": "https://github.com/toba/jig-go/schema.json",
   "title": ".jig.yaml",
   "description": "Configuration file for jig.",
   "type": "object",

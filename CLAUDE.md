@@ -2,7 +2,7 @@
 
 Multi-tool CLI combining citation monitoring, Claude Code security guard, two-phase commit workflow, multi-profile Claude Code management, and Homebrew/Scoop/Zed companion repo scaffolding.
 
-The module is `github.com/toba/jig` but the built binary and distributed package are named **`jigo`** (`brew install toba/tap/jigo`) — the `jig` name was already taken.
+The GitHub repo is `toba/jig-go` and the Go module is `github.com/toba/jig-go/v4` (the `/v4` suffix is required by Go for major version ≥ 2, and must be bumped in lockstep with the major tag); the built binary and distributed package are named **`jigo`** (`brew install toba/tap/jigo`) — the `jig` name was already taken. Only the config file keeps the old name: `.jig.yaml`.
 
 ## Rules
 
@@ -48,7 +48,8 @@ scripts/lint.sh        # golangci-lint with auto-fix, then report remaining issu
 
 ## Key Design Decisions
 
-- The binary is `jigo`, but the Go module path, GitHub repo, and config file (`.jig.yaml`) all keep the `jig` name — only the distributed package and command were renamed
+- The binary is `jigo` and the module/repo is `toba/jig-go`; only the config file (`.jig.yaml`) keeps the bare `jig` name, since renaming it would break every repo already using jig for `cite`/`nope`/`brew`
+- The release workflow derives tap/bucket URLs from `$GITHUB_REPOSITORY` rather than hardcoding a repo path — a hardcoded `toba/jig` silently 404'd for months after the repo was renamed to `toba/jig-go`, since GitHub does not redirect release-asset downloads
 - Config uses yaml.v3 Node API for partial read/write to avoid clobbering other sections in `.jig.yaml`
 - GitHub calls shell out to `gh` CLI (no API token management needed)
 - `cite review` (alias `check`) is read-only and repeatable — it never advances `last_checked_sha`/`last_checked_date`, so an agent can re-run it (or recover from lost output) without losing changes. `cite mark` advances the marker (and `last_checked_tag` for release-tracked sources) to current HEAD as a separate explicit step

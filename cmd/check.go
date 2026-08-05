@@ -7,10 +7,10 @@ import (
 	"sync"
 
 	"github.com/spf13/cobra"
-	"github.com/toba/jig/internal/classify"
-	"github.com/toba/jig/internal/config"
-	"github.com/toba/jig/internal/display"
-	"github.com/toba/jig/internal/github"
+	"github.com/toba/jig-go/v4/internal/classify"
+	"github.com/toba/jig-go/v4/internal/config"
+	"github.com/toba/jig-go/v4/internal/display"
+	"github.com/toba/jig-go/v4/internal/github"
 	"golang.org/x/sync/errgroup"
 )
 

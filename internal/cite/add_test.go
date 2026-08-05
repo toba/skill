@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/toba/jig/internal/config"
+	"github.com/toba/jig-go/v4/internal/config"
 )
 
 func TestParseRepoArg(t *testing.T) {

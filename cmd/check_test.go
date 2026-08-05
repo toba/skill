@@ -4,9 +4,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/toba/jig/internal/classify"
-	"github.com/toba/jig/internal/config"
-	"github.com/toba/jig/internal/github"
+	"github.com/toba/jig-go/v4/internal/classify"
+	"github.com/toba/jig-go/v4/internal/config"
+	"github.com/toba/jig-go/v4/internal/github"
 )
 
 // fakeReleaseClient implements just enough of github.Client to drive

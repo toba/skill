@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/toba/jig/internal/brew"
-	"github.com/toba/jig/internal/companion"
+	"github.com/toba/jig-go/v4/internal/brew"
+	"github.com/toba/jig-go/v4/internal/companion"
 )
 
 // InitOpts holds the inputs for scoop init.

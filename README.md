@@ -41,10 +41,10 @@ The binary is named `jigo` (the `jig` name was already taken in Homebrew).
       - **`login`**: re-authenticate an alias
       - **`doctor`**: verify profile isolation is intact
    - **[`brew`](#brew)**: Homebrew tap management
-      - **`init`**: create tap repo, push initial formula, inject `update-homebrew` CI job
+      - **`init`**: push a formula to the shared tap, inject `update-homebrew` CI job
       - **`doctor`**: verify brew tap setup is healthy
    - **[`scoop`](#scoop)**: Scoop bucket management
-      - **`init`**: create bucket repo, push initial manifest, inject `update-scoop` CI job
+      - **`init`**: push a manifest to the shared bucket, inject `update-scoop` CI job
       - **`doctor`**: verify scoop bucket setup is healthy
    - **[`zed`](#zed)**: Zed extension management
       - **`init`**: create extension repo, push scaffold, inject `sync-extension` CI job
@@ -67,7 +67,7 @@ scoop install jigo
 Or build from source:
 
 ```bash
-go install github.com/toba/jig@latest
+go install github.com/toba/jig-go/v4@latest
 ```
 
 ## Cite
@@ -169,14 +169,16 @@ jigo commit
 
 I just got tired of re-figuring-out how to set up the companion repository for homebrew releases. At first I used an agent skill, which helped but I ended up with three different approaches for three repositories.
 
+It pushes a formula to an existing shared tap repo, defaulting to `owner/homebrew-tap` derived from the current GitHub repo, and injects an `update-homebrew` job into the release workflow. The tap repo must already exist.
+
 ```bash
-jigo brew init --tap toba/homebrew-todo
+jigo brew init
 ```
 
 It auto-detects the source repo, latest release tag, description, and license via `gh`. The formula SHA256 is resolved using the same three-strategy approach (`.sha256` sidecar, `checksums.txt`, direct download). After running, tap updates happen automatically via CI.
 
 ```bash
-jigo brew init --tap toba/homebrew-todo --tag v1.2.3 --repo toba/todo --desc "My tool" --license MIT
+jigo brew init --tap toba/homebrew-tap --tag v1.2.3 --repo toba/mytool --desc "My tool" --license MIT
 ```
 
 Use `--dry-run` to preview without creating anything. Use `--json` for machine-readable output.
@@ -185,16 +187,16 @@ Use `--dry-run` to preview without creating anything. Use `--json` for machine-r
 
 ## Scoop
 
-Same idea as brew, but for Windows. Creates a companion Scoop bucket repo with a JSON manifest covering both amd64 and arm64, and injects an `update-scoop` CI job into the release workflow.
+Same idea as brew, but for Windows. Pushes a JSON manifest covering both amd64 and arm64 to an existing shared bucket repo, defaulting to `owner/scoop-bucket`, and injects an `update-scoop` CI job into the release workflow.
 
 ```bash
-jigo scoop init --bucket toba/scoop-jig
+jigo scoop init
 ```
 
 It auto-detects the source repo, latest release tag, description, and license via `gh`. SHA256 hashes are resolved for both `_windows_amd64.zip` and `_windows_arm64.zip` archives. The manifest includes `checkver` and `autoupdate` sections so Scoop's tooling can pick up new versions automatically.
 
 ```bash
-jigo scoop init --bucket toba/scoop-jig --tag v1.2.3 --repo toba/jig --desc "My tool" --license MIT
+jigo scoop init --bucket toba/scoop-bucket --tag v1.2.3 --repo toba/mytool --desc "My tool" --license MIT
 ```
 
 Use `--dry-run` to preview without creating anything. Use `--json` for machine-readable output.
@@ -239,10 +241,10 @@ zed_extension: owner/repo
 
 Config reading uses the yaml.v3 Node API for partial read/write, so no section clobbers another.
 
-A [JSON Schema](https://raw.githubusercontent.com/toba/jig/main/schema.json) is available for editor autocomplete and validation. Add this modeline to the top of your `.jig.yaml`:
+A [JSON Schema](https://raw.githubusercontent.com/toba/jig-go/main/schema.json) is available for editor autocomplete and validation. Add this modeline to the top of your `.jig.yaml`:
 
 ```yaml
-# yaml-language-server: $schema=https://raw.githubusercontent.com/toba/jig/main/schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/toba/jig-go/main/schema.json
 ```
 
 ## Requirements

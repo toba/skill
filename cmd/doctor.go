@@ -5,7 +5,7 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/spf13/cobra"
-	"github.com/toba/jig/internal/nope"
+	"github.com/toba/jig-go/v4/internal/nope"
 )
 
 var (

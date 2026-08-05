@@ -9,7 +9,7 @@ import (
 type ManifestParams struct {
 	Tool        string // binary name, e.g. "jig"
 	Desc        string // one-line description
-	Homepage    string // e.g. "https://github.com/toba/jig"
+	Homepage    string // e.g. "https://github.com/toba/jig-go"
 	License     string // e.g. "Apache-2.0"
 	Tag         string // e.g. "v1.2.3"
 	Repo        string // e.g. "toba/jig"

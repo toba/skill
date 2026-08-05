@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/toba/jig/internal/cc"
+	"github.com/toba/jig-go/v4/internal/cc"
 )
 
 var (

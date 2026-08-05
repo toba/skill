@@ -7,8 +7,8 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"github.com/spf13/cobra"
-	"github.com/toba/jig/internal/brew"
-	"github.com/toba/jig/internal/config"
+	"github.com/toba/jig-go/v4/internal/brew"
+	"github.com/toba/jig-go/v4/internal/config"
 )
 
 var (

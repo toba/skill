@@ -14,9 +14,9 @@ tmp="$(mktemp)"
 trap 'rm -f "$tmp"' EXIT
 
 go build -ldflags "\
-  -X github.com/toba/jig/cmd.ver=${ver} \
-  -X github.com/toba/jig/cmd.commit=${commit} \
-  -X github.com/toba/jig/cmd.date=${built}" -o "${tmp}" .
+  -X github.com/toba/jig-go/v4/cmd.ver=${ver} \
+  -X github.com/toba/jig-go/v4/cmd.commit=${commit} \
+  -X github.com/toba/jig-go/v4/cmd.date=${built}" -o "${tmp}" .
 
 # `install` follows symlinks, which would write through to the Cellar binary and
 # corrupt the Homebrew install. Remove the symlink first, then drop in our build.

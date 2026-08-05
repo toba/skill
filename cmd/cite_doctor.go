@@ -2,10 +2,10 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/toba/jig/internal/cite"
-	"github.com/toba/jig/internal/config"
-	"github.com/toba/jig/internal/github"
-	"github.com/toba/jig/internal/nope"
+	"github.com/toba/jig-go/v4/internal/cite"
+	"github.com/toba/jig-go/v4/internal/config"
+	"github.com/toba/jig-go/v4/internal/github"
+	"github.com/toba/jig-go/v4/internal/nope"
 )
 
 var citeDoctorCmd = &cobra.Command{

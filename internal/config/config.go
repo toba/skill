@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/toba/jig/internal/constants"
+	"github.com/toba/jig-go/v4/internal/constants"
 	"gopkg.in/yaml.v3"
 )
 

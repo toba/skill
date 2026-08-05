@@ -10,7 +10,7 @@ func TestGenerateManifest(t *testing.T) {
 	m := GenerateManifest(ManifestParams{
 		Tool:        "jig",
 		Desc:        "Multi-tool CLI",
-		Homepage:    "https://github.com/toba/jig",
+		Homepage:    "https://github.com/toba/jig-go",
 		License:     "Apache-2.0",
 		Tag:         "v1.0.0",
 		Repo:        "toba/jig",
@@ -27,7 +27,7 @@ func TestGenerateManifest(t *testing.T) {
 	checks := []string{
 		`"version": "1.0.0"`,
 		`"description": "Multi-tool CLI"`,
-		`"homepage": "https://github.com/toba/jig"`,
+		`"homepage": "https://github.com/toba/jig-go"`,
 		`"license": "Apache-2.0"`,
 		`"jig.exe"`,
 		"jig_windows_amd64.zip",
