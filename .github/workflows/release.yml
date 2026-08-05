@@ -75,12 +75,13 @@ jobs:
           sed -i 's/^          //' Formula/jigo.rb
 
           # Drop the pre-rename formula so `brew install toba/tap/jig` stops
-          # serving a stale version. No-op once it's gone.
-          rm -f Formula/jig.rb
+          # serving a stale version. --ignore-unmatch keeps this a no-op on
+          # every run after the first, when the file is already gone.
+          git rm -f --ignore-unmatch Formula/jig.rb
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A Formula/jigo.rb Formula/jig.rb
+          git add Formula/jigo.rb
           git commit -m "bump to ${VERSION}"
           git push
 
@@ -151,11 +152,12 @@ jobs:
             }' > jigo.json
 
           # Drop the pre-rename manifest so `scoop install jig` stops serving a
-          # stale version. No-op once it's gone.
-          rm -f jig.json
+          # stale version. --ignore-unmatch keeps this a no-op on every run
+          # after the first, when the file is already gone.
+          git rm -f --ignore-unmatch jig.json
 
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A jigo.json jig.json
+          git add jigo.json
           git commit -m "bump jigo to ${VERSION}"
           git push
