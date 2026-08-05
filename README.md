@@ -70,6 +70,8 @@ Or build from source:
 go install github.com/toba/jig-go/v4@latest
 ```
 
+Go names the binary after the module path, so this installs it as `jig-go`. Rename it to `jigo` if you want it to match the docs. The Homebrew and Scoop packages install it as `jigo` already.
+
 ## Cite
 
 This arose as a new pattern (to me) while working with agents. The agent makes it easy to fork a repo and make a bunch of updates. Great. But it was quickly obvious that these changes didn't constitute a proper contribution back to the source. There were too many changes, too specific to my use-case. I also began combining sources, further impeding formal contribution.
