@@ -53,8 +53,8 @@ jobs:
           cat > Formula/jigo.rb << FORMULA
           class Jigo < Formula
             desc "Multi-tool CLI for upstream repo monitoring and Claude Code security guard"
-            homepage "https://github.com/toba/jig"
-            url "https://github.com/toba/jig/releases/download/${TAG}/jigo_darwin_arm64.tar.gz"
+            homepage "https://github.com/${GITHUB_REPOSITORY}"
+            url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/jigo_darwin_arm64.tar.gz"
             version "${VERSION}"
             sha256 "${SHA}"
             license "Apache-2.0"
@@ -112,36 +112,39 @@ jobs:
           git clone "https://x-access-token:${GH_TOKEN}@github.com/toba/scoop-bucket.git" bucket
           cd bucket
 
+          # $repo carries the real repo path; hardcoding it drifts when the repo
+          # is renamed, which is how the formula URL ended up 404ing.
           jq -n \
             --arg version "$VERSION" \
             --arg sha_amd64 "$SHA_AMD64" \
             --arg sha_arm64 "$SHA_ARM64" \
             --arg tag "$TAG" \
-            --arg desc "Multi-tool CLI for issue tracking, citations, commits, and distribution" \
+            --arg repo "$GITHUB_REPOSITORY" \
+            --arg desc "Multi-tool CLI for citations, commits, Claude Code guard, and distribution" \
             '{
               version: $version,
               description: $desc,
-              homepage: "https://github.com/toba/jig",
+              homepage: ("https://github.com/" + $repo),
               license: "Apache-2.0",
               architecture: {
                 "64bit": {
-                  url: ("https://github.com/toba/jig/releases/download/" + $tag + "/jigo_windows_amd64.zip"),
+                  url: ("https://github.com/" + $repo + "/releases/download/" + $tag + "/jigo_windows_amd64.zip"),
                   hash: $sha_amd64
                 },
                 arm64: {
-                  url: ("https://github.com/toba/jig/releases/download/" + $tag + "/jigo_windows_arm64.zip"),
+                  url: ("https://github.com/" + $repo + "/releases/download/" + $tag + "/jigo_windows_arm64.zip"),
                   hash: $sha_arm64
                 }
               },
               bin: ["jigo.exe"],
-              checkver: { github: "https://github.com/toba/jig" },
+              checkver: { github: ("https://github.com/" + $repo) },
               autoupdate: {
                 architecture: {
                   "64bit": {
-                    url: "https://github.com/toba/jig/releases/download/v$version/jigo_windows_amd64.zip"
+                    url: ("https://github.com/" + $repo + "/releases/download/v$version/jigo_windows_amd64.zip")
                   },
                   arm64: {
-                    url: "https://github.com/toba/jig/releases/download/v$version/jigo_windows_arm64.zip"
+                    url: ("https://github.com/" + $repo + "/releases/download/v$version/jigo_windows_arm64.zip")
                   }
                 }
               }
